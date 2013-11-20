@@ -3,15 +3,12 @@
 
 # DIM = n
 
-    
-
-
 # calc_P
 # i is the ?????, and H is the point
 def calc_P(i, H, n, ORDER):
     element = i / ORDER
     P = H[element]
-    if(i % ORDER > ORDER - DIM):
+    if(i % ORDER > ORDER - n):
         temp1 = H[element + 1]
         P >>= i % ORDER
         temp1 <<= ORDER - i % ORDER
@@ -76,11 +73,11 @@ def hilbert_key_encode(point, n, m):
     for j in range(0, n):
         g_mask.append(1 << j)
     g_mask.reverse()
-    mask = 2**(ORDER - 1)
+    mask = 2 ** ORDER - 1
+    W = 0
     P = 0
     h = [0]*n
     i = ORDER * n - n
-    W = 0
     A = 0
     for j in range(0, n):
         if(point[j] & mask):
@@ -99,9 +96,8 @@ def hilbert_key_encode(point, n, m):
     T = calc_T(P)
     tT = T
 
-    g = []
-    j = i
     mask >>= 1
+    i -= n
     while i >= 0:
         j = A = 0
         for j in range(0, n):
@@ -123,6 +119,7 @@ def hilbert_key_encode(point, n, m):
             J = calc_J(P, n)
             xJ += J - 1
         i -= n
+        mask >>= 1
 
     return h
         
