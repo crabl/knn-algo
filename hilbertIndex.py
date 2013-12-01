@@ -34,24 +34,7 @@ def rightRotate(a, b, m):
     return int(w.uint)
 
 def g(i):
-    count = 0
-    while i % 2 == 1:
-        i /= 2
-        count += 1
-    return count
-
-def E(i, n):
-    if i < 0:
-        print "e: THERE SHOULD NOT BE NEGATIVE NUMBERS >:|"
-        return 0
-    elif i == 0:
-        return 0
-    elif i <= 2 ** n - 1:
-        return gc(int(2*math.floor(i - 1 / 2)))
-    # I am not sure if this is what the paper means or not
-    else:
-        #print "e: YOU ARE BIGGER THAN 2 ** n - 1"
-        return (gc(int(2*math.floor(i - 1 / 2)))) ^ (2 ** (n - 1))
+    return int(math.log(gc(i) ^ gc(i+1), 2))
 
 def D(i, n):
     if i < 0:
@@ -66,6 +49,26 @@ def D(i, n):
     else:
         print "d: FIX ME!!!!!!"
         return 0
+
+def E(i, n):
+    if i == 0:
+        return 0
+    return E(i - 1, n) ^ (2 ** D(i - 1, n)) ^ (2 ** g(i - 1))
+
+"""
+    if i < 0:
+        print "e: THERE SHOULD NOT BE NEGATIVE NUMBERS >:|"
+        return 0
+    elif i == 0:
+        return 0
+    elif i <= 2 ** n - 1:
+        return gc(int(2*math.floor(i - 1 / 2)))
+    # I am not sure if this is what the paper means or not
+    else:
+        #print "e: YOU ARE BIGGER THAN 2 ** n - 1"
+        return (gc(int(2*math.floor(i - 1 / 2)))) ^ (2 ** (n - 1))
+"""
+
 
 def L(i, p, n, m):
     l = bitstring.BitArray()
