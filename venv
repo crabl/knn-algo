@@ -1,3 +1,4 @@
 #!/bin/sh
 
 export PYTHONPATH="$PYTHONPATH:$HOME/local/lib/python2.6/site-packages"
+export PS1="(venv) $PS1"
