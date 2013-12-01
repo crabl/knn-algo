@@ -81,3 +81,8 @@ def hilbertIndex(n, m, p):
         d = (d + D(w, n) + 1) % n
         h = (h << n) | w
     return h
+
+def hilbert_index(points, n, m):
+    hilbert_path = [hilbert_index(n,m,point) for point in points]
+    ordered_path = [point for (h,point) in sorted(zip(hilbert_path, points))]
+    return ordered_path
