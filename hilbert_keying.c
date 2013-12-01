@@ -180,11 +180,10 @@ Hcode H_encode(Point pt)
       //cout << pt.hcode[j] << " " << mask << endl;
       //cout << (pt.hcode[j] & mask) << endl;
       if (pt.hcode[j] & mask) {
-	 //cout << "I MAKE SOME FUCKING SENSE" << endl;
 	 A |= g_mask[j];
       }
    }
-   printf("A: %d \n", &A);
+//   printf("A: %f \n", &A);
 //   cout <<"A: "<<  A << endl;
    S = tS = A;
    P = calc_P2(S);
@@ -220,22 +219,34 @@ Hcode H_encode(Point pt)
 	 J = calc_J(P);
 	 xJ += J - 1;
       }
-      printf("W: %d, ", &W);
+//      printf("W: %f, ", &W);
    }
-   printf("\n");
+//   printf("\n");
    return h;
 }
 
 int main() {
 
-   Hcode pt = {1, 2, 3};
+   Hcode pt;
+   pt.hcode[0] = (unsigned int)(3);
+   pt.hcode[1] = (unsigned int)(2);
+   pt.hcode[2] = (unsigned int)(1);
+   /* while(scanf("%u %u %u", &pt.hcode[0], &pt.hcode[1], &pt.hcode[2])) { 
+    */
+   printf("input numbers:\n");
+   for(int i = 0; i < DIM; i++) { 
+      printf(" %u", &pt.hcode[i]);
+   }
+   printf("\n");
 
    pt = H_encode(pt);
 
+   printf("encoded numbers:\n");
    for(int i = 0; i < DIM; i++) {
-      printf(" %i", &pt.hcode[i]);
+      printf(" %u", &pt.hcode[i]);
    }
    printf("\n");
+   /*}*/
     
    return 0;
 }
