@@ -6,11 +6,13 @@ import math
 import bitstring
 
 # gray code
-def gc(): 
+def gc(i): 
     return i ^ (i >> 1);
 
 # gray code Inverse
 def gcInverse(g):
+    if g == 0:
+        return 0
     m = int(math.floor(math.log(g, 2))) # number of bits required to represent g
     i = g
     j = 1
@@ -56,18 +58,18 @@ def D(i, n):
         return 0
     elif i == 0:
         return 0
-    elif i % n == 0:
+    elif (i % 2) == 0:
         return g(i - 1) % n
-    elif i % n == 1:
+    elif (i % 2) == 1:
         return g(i) % n
     else:
-        print "d: FUCK MY LIFE SO MUCH"
+        print "d: FIX ME!!!!!!"
         return 0
 
-def L(i, p, n):
+def L(i, p, n, m):
     l = bitstring.BitArray()
     for j in range(0, n):
-        q = bitstring.BitArray(uint = p[j], length = n)
+        q = bitstring.BitArray(uint = p[j], length = m)
         q.reverse()
         l += q[i:i + 1]
     l.reverse()
@@ -84,10 +86,10 @@ def hilbertIndex(n, m, p):
     d = 0
     for q in range(1, m + 1):
         i = m - q
-        l = L(i, p, n)# l <-[bit(p_(n-1),i)...bit(p_0, i)]_[2]u
-        l = rightRotate((l ^ e), (d+1)) # l <- T_(e, d) (l)
+        l = L(i, p, n, m)# l <-[bit(p_(n-1),i)...bit(p_0, i)]_[2]u
+        l = rightRotate((l ^ e), (d+1), m) # l <- T_(e, d) (l)
         w = gcInverse(l)
         e = e ^ (leftRotate(E(w, n), (d+1), m))
-        d = d + D(w, n) + 1 % n
-        h <- (h << n) ^ w
+        d = (d + D(w, n) + 1) % n
+        h = (h << n) | w
     return h
