@@ -8,17 +8,72 @@
 
 import numpy
 import sys
+import math
+import bitstring
 
-import lattice
-import basis
+class MortonPoint:
+    def __init__(self, point):
+        self.dimensions = len(point)
+        self.point = point
+
+    # Test if two points have the same Morton order
+    def __eq__(self, other):
+        return self.point == other.point
+        
+    # Test for less than in terms of Morton ordering
+    def __lt__(self, other):
+        
+        return False
+
+    # Return the Most Significant Differing Bit of two integers
+    def msdb(self, a, b):
+        bit_num = 0
+        num = a ^ b # Bitwise XOR on a and b
+
+        # Shift until we reach the most significant bit
+        while num != 0:
+            bit_num += 1
+            num = num >> 1
+
+        return bit_num
+
+    # Return XOR of most significant bit between two floating point numbers
+    def xor_msb(self, a, b):
+        a = float(a)
+        b = float(b)
+        mantissa_a, exponent_a = math.frexp(a)
+        mantissa_b, exponent_b = math.frexp(b)
+        
+        if exponent_a == exponent_b:
+            # Need to get the integer mantissa, since math.frexp
+            # gives it to us as a float
+            int_mantissa_a = int(str(mantissa(a))[2:])
+            int_mantissa_b = int(str(mantissa(b))[2:])
+            most_sig_dif_bit = self.msdb(mantissa_a, mantissa_b)
+            return exponent_a - most_sig_dif_bit
+        
+        if exponent_b < exponent_a:
+            return exponent_a
+
+        return exponent_b
+
+class HilbertPoint:
+    def __init__(self, point):
+        self.dimensions = len(point)
+        self.point = point
+
+    # Test if two points have the same Hilbert order
+    def __eq__(self, other):
+        return False
+
+    # Test for less than in terms of Hilbert ordering
+    def __lt__(self, other):
+        return False
+
+# Write quicksort function and parallelize using pp
 
 def main():
-    file_name = str(sys.argv[1])
-    k = int(sys.argv[2])
-
-    data_set = np.genfromtxt(file_name, delimiter="\t") # Get from CSV
-    basis_vectors = basis.get_basis(dataset)
-    lattice_points = lattice.from_vectors(data_set, basis_vectors)
+    print "Hello, world!"
 
 
 if __name__ == "__main__":
