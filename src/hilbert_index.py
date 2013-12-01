@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # Hilbert Keying Algo
+# Camara Lerner - University of Lethbridge
 
 #run source venv
 import math
@@ -55,21 +56,6 @@ def E(i, n):
         return 0
     return E(i - 1, n) ^ (2 ** D(i - 1, n)) ^ (2 ** g(i - 1))
 
-"""
-    if i < 0:
-        print "e: THERE SHOULD NOT BE NEGATIVE NUMBERS >:|"
-        return 0
-    elif i == 0:
-        return 0
-    elif i <= 2 ** n - 1:
-        return gc(int(2*math.floor(i - 1 / 2)))
-    # I am not sure if this is what the paper means or not
-    else:
-        #print "e: YOU ARE BIGGER THAN 2 ** n - 1"
-        return (gc(int(2*math.floor(i - 1 / 2)))) ^ (2 ** (n - 1))
-"""
-
-
 def L(i, p, n, m):
     l = bitstring.BitArray()
     for j in range(0, n):
@@ -78,8 +64,6 @@ def L(i, p, n, m):
         l += q[i:i + 1]
     l.reverse()
     return int(l.uint)
-        
-
 
 # n is the number of dimensions
 # m is the precision (# of bits) of each of the n dimensions
