@@ -7,13 +7,13 @@ import bitstring
 
 # gray code
 def gc(i): 
-    return i ^ (i >> 1);
+    return i ^ (i >> 1)
 
 # gray code Inverse
 def gcInverse(g):
     if g == 0:
         return 0
-    m = int(math.floor(math.log(g, 2))) # number of bits required to represent g
+    m = int(math.floor(math.log(g, 2))+1) # number of bits required to represent g
     i = g
     j = 1
     while j < m:
@@ -42,19 +42,20 @@ def g(i):
 
 def E(i, n):
     if i < 0:
-        print "e: FUCK MY LIFE -"
+        print "e: THERE SHOULD NOT BE NEGATIVE NUMBERS >:|"
         return 0
     elif i == 0:
         return 0
     elif i <= 2 ** n - 1:
         return gc(int(2*math.floor(i - 1 / 2)))
+    # I am not sure if this is what the paper means or not
     else:
-        print "e: FUCK MY LIFE >"
-        return 0
+        #print "e: YOU ARE BIGGER THAN 2 ** n - 1"
+        return (gc(int(2*math.floor(i - 1 / 2)))) ^ (2 ** (n - 1))
 
 def D(i, n):
     if i < 0:
-        print "d: FUCK MY LIFE -"
+        print "d: WHY IS THERE A NEGATIVE NUMBER >:|"
         return 0
     elif i == 0:
         return 0
