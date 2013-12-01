@@ -50,7 +50,7 @@ def main():
     points_8 = [(x,y,z) for x in range(8) for y in range(8) for z in range(8)]
     #points_8 = [(x,y) for y in range(8) for x in range(8)]
     print "Performing Hilbert ordering..."
-    hilbert_path = [hilbertIndex(2,8,point) for point in points_8]
+    hilbert_path = [hilbertIndex(3,8,point) for point in points_8]
     ordered_path = [point for (hilbert_index,point) in sorted(zip(hilbert_path, points_8))]
     data_set = [random_3d_point() for i in range(20)]
     #data_set = [random_2d_point() for i in range(20)]
@@ -58,7 +58,7 @@ def main():
     print "Drawing graph..."
 
     for i in range(len(ordered_path)):
-        draw_graph_3d(data_set, ordered_path[0:i], "animation/hilbert"+str(i)+".jpg", 30, 45)
+        draw_graph_3d(data_set, ordered_path[0:i], "animation/hilbert"+str(i)+".jpg", 30, i % 360)
         #draw_graph_2d(data_set, ordered_path[0:i], "animation/hilbert"+str(i)+".jpg")
     
 if __name__ == "__main__":
