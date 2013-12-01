@@ -13,8 +13,15 @@ import bitstring
 
 class MortonPoint:
     def __init__(self, point):
-        self.dimensions = len(point)
         self.point = point
+
+    # Override len to give us the number of dimensions in the point
+    def __len__(self):
+        return len(self.point)
+
+    # Override array subscript operator
+    def __getitem__(self, key):
+        return self.point[key]
 
     # Test if two points have the same Morton order
     def __eq__(self, other):
@@ -22,8 +29,15 @@ class MortonPoint:
         
     # Test for less than in terms of Morton ordering
     def __lt__(self, other):
-        
-        return False
+        x = 0
+        dim = 0
+        for j in range(0, len(self)):
+            y = self.xor_msb(self[j], other[j])
+            if x < y:
+                x = y
+                dim = j
+    
+        return self[dim] < other[dim]
 
     # Return the Most Significant Differing Bit of two integers
     def msdb(self, a, b):
@@ -47,9 +61,9 @@ class MortonPoint:
         if exponent_a == exponent_b:
             # Need to get the integer mantissa, since math.frexp
             # gives it to us as a float
-            int_mantissa_a = int(str(mantissa(a))[2:])
-            int_mantissa_b = int(str(mantissa(b))[2:])
-            most_sig_dif_bit = self.msdb(mantissa_a, mantissa_b)
+            int_mantissa_a = int(str(mantissa_a)[2:])
+            int_mantissa_b = int(str(mantissa_b)[2:])
+            most_sig_dif_bit = self.msdb(int_mantissa_a, int_mantissa_b)
             return exponent_a - most_sig_dif_bit
         
         if exponent_b < exponent_a:
