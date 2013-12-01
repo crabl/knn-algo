@@ -48,18 +48,18 @@ def random_3d_point():
 
 def main():
     #points_16 = [(x,y,z) for x in range(16) for y in range(16) for z in range(16)]
-    #points_8 = [(x,y) for y in range(16) for x in range(16)]
+    points_16 = [(x,y) for y in range(16) for x in range(16)]
     print "Performing Hilbert ordering..."
-    data_set = [random_3d_point() for i in range(50)]
-    hilbert_path = [hilbertIndex(3,16,point) for point in data_set]
-    ordered_path = [point for (hilbert_index,point) in sorted(zip(hilbert_path, data_set))]
+    data_set = [random_2d_point() for i in range(50)]
+    hilbert_path = [hilbertIndex(2,16,point) for point in points_16]
+    ordered_path = [point for (hilbert_index,point) in sorted(zip(hilbert_path, points_16))]
     #data_set = [random_3d_point() for i in range(20)]
     #data_set = [random_2d_point() for i in range(20)]
     print "Drawing graph..."
 
     for i in range(len(ordered_path)+1):
-        draw_graph_3d(data_set, ordered_path[0:i], "animation/hilbert"+str(i)+".jpg", 30, i % 360)
-        #draw_graph_2d(data_set, ordered_path[0:i], "animation/hilbert"+str(i)+".jpg")
+        #draw_graph_3d(data_set, ordered_path[0:i], "animation/hilbert"+str(i)+".jpg", 30, i % 360)
+        draw_graph_2d(data_set, ordered_path[0:i], "animation/hilbert"+str(i)+".jpg")
     
 if __name__ == "__main__":
     main()
