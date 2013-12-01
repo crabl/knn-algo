@@ -91,9 +91,9 @@ def hilbertIndex(n, m, p):
     for q in range(1, m + 1):
         i = m - q
         l = L(i, p, n, m)# l <-[bit(p_(n-1),i)...bit(p_0, i)]_[2]u
-        l = rightRotate((l ^ e), (d+1), m) # l <- T_(e, d) (l)
+        l = rightRotate((l ^ e), (d+1), n) # l <- T_(e, d) (l)
         w = gcInverse(l)
-        e = e ^ (leftRotate(E(w, n), (d+1), m))
+        e = e ^ (leftRotate(E(w, n), (d+1), n))
         d = (d + D(w, n) + 1) % n
         h = (h << n) | w
     return h
