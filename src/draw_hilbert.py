@@ -47,18 +47,19 @@ def random_3d_point():
     return (random.randint(0,15), random.randint(0,15), random.randint(0,15))
 
 def main():
-    #points_8 = [(x,y,z) for x in range(8) for y in range(8) for z in range(8)]
-    points_8 = [(x,y) for y in range(16) for x in range(16)]
+    #points_16 = [(x,y,z) for x in range(16) for y in range(16) for z in range(16)]
+    #points_8 = [(x,y) for y in range(16) for x in range(16)]
     print "Performing Hilbert ordering..."
-    hilbert_path = [hilbertIndex(2,16,point) for point in points_8]
-    ordered_path = [point for (hilbert_index,point) in sorted(zip(hilbert_path, points_8))]
+    data_set = [random_3d_point() for i in range(50)]
+    hilbert_path = [hilbertIndex(3,16,point) for point in data_set]
+    ordered_path = [point for (hilbert_index,point) in sorted(zip(hilbert_path, data_set))]
     #data_set = [random_3d_point() for i in range(20)]
-    data_set = [random_2d_point() for i in range(20)]
+    #data_set = [random_2d_point() for i in range(20)]
     print "Drawing graph..."
 
-    for i in range(len(ordered_path)):
-        #draw_graph_3d(data_set, ordered_path[0:i], "animation/hilbert"+str(i)+".jpg", 30, i % 360)
-        draw_graph_2d(data_set, ordered_path[0:i], "animation/hilbert"+str(i)+".jpg")
+    for i in range(len(ordered_path)+1):
+        draw_graph_3d(data_set, ordered_path[0:i], "animation/hilbert"+str(i)+".jpg", 30, i % 360)
+        #draw_graph_2d(data_set, ordered_path[0:i], "animation/hilbert"+str(i)+".jpg")
     
 if __name__ == "__main__":
     main()
