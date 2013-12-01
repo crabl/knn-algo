@@ -10,6 +10,7 @@ import numpy
 import sys
 import math
 import bitstring
+from hilbertIndex import *
 
 class MortonPoint:
     def __init__(self, point):
@@ -71,22 +72,40 @@ class MortonPoint:
 
         return exponent_b
 
-class HilbertPoint:
-    def __init__(self, point):
-        self.dimensions = len(point)
-        self.point = point
+# Euclidean distance between two points
+def distance(a, b):
+    return np.sqrt(((np.array(a)-np.array(b))**2).sum())
 
-    # Test if two points have the same Hilbert order
-    def __eq__(self, other):
-        return False
+# Find the indices of the k smallest items in a set S, assuming that S contains a zero element
+def k_smallest_indices(k, S):
+    # We have to look at [1:k+1] because we assume that S contains the point
+    # that we are looking for
+    return [idx for (s, idx) in sorted(zip(S,range(len(S))))][1:k+1]
 
-    # Test for less than in terms of Hilbert ordering
-    def __lt__(self, other):
-        return False
+# Find the k nearest neighbors to a point in a given set S
+def set_knn(point, k, S):
+    distance_array = [distance(p,s) for s in S]
 
-# Write quicksort function and parallelize using pp
+    # Find the indices of the k smallest items in S
+    smallest_indices = k_smallest_indices(k, distance_array)
+
+    # Find the points corresponding to those indices
+    nearest_neighbors = [S[i] for i in smallest_indices]
+    return nearest_neighbors
+
+# The radius of a set is the largest distance between any two points in the set S
+def set_radius(S):
+    distance_matrix = np.zeros(len(S), len(S))
+    distance_matrix.flat = [distance(p0, p1) for p0 in S for p1 in S]
+    return np.max(distance_matrix)
 
 def main():
+    P = [(3,2),(1,7),(4,4),(6,1),(7,2),(2,5),(1,1)]
+    H = [hilbertIndex(2,8,point) for point in P]
+    hilbert_ordered = [p for (h,p) in sorted(zip(H, P))] # Sort the points in Hilbert order
+
+    print hilbert_ordered
+    
     print "Hello, world!"
 
 
