@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from hilbertIndex import *
+from hilbert_index import *
 import random
 
 def draw_graph_2d(points, path, file_name):
@@ -51,8 +51,8 @@ def main():
     points_16 = [(x,y) for y in range(16) for x in range(16)]
     print "Performing Hilbert ordering..."
     data_set = [random_2d_point() for i in range(50)]
-    hilbert_path = [hilbertIndex(2,16,point) for point in points_16]
-    ordered_path = [point for (hilbert_index,point) in sorted(zip(hilbert_path, points_16))]
+    hilbert_path = [hilbert_index(2,16,point) for point in points_16]
+    ordered_path = [point for (h,point) in sorted(zip(hilbert_path, points_16))]
     #data_set = [random_3d_point() for i in range(20)]
     #data_set = [random_2d_point() for i in range(20)]
     print "Drawing graph..."
