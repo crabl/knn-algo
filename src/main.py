@@ -10,8 +10,26 @@ import numpy
 import sys
 import math
 import bitstring
+import numpy as np
+
 from hilbert_index import *
 from morton_index import *
+
+V_CONSTANT = 4 # Platform-dependent constant
+
+class MortonPoint:
+    def __init__(self, point):
+        self.point = np.array(point)
+    
+    def __lt__(self, other):
+        if cmp_zorder(self.point, other.point) < 0:
+            return True
+        return False
+
+    def __eq__(self, other):
+        if cmp_zorder(self.point, other.point) == 0:
+            return True
+        return False
 
 # Euclidean distance between two points
 def distance(a, b):
@@ -40,19 +58,36 @@ def set_radius(S):
     distance_matrix.flat = [distance(p0, p1) for p0 in S for p1 in S]
     return np.max(distance_matrix)
 
+def csearch(point, low, hi):
+    if (hi-low) < V_CONSTANT:
+        
+
 def construct_morton(points, k):
     for i in range(len(points)):
-        A_i = set_knn(points[i], points[i-k, i+k])
-        u = 0
-        I = 0
+        A_i = [points[i-k:i+k][index] for index in set_knn(points[i], points[i-k:i+k])]
+        upper = 0
+        lower = 0
+
         # if p_i^ceil(rad(A_i)) < p_i+k
-        if cmp_zorder(np.array(points[i]) ** np.ceil(set_radius(A_i)), np.array(points[i+k])) < 0:
-            u = i
+        if MortonPoint(np.array(points[i]) ** np.ceil(set_radius(A_i))) < MortonPoint(np.array(points[i+k])):
+            upper = i
         else:
             I = 0
-            while cmp_zorder(np.array(points[i]) ** np.ceil(set_radius(A_i)), np.array(points[i+2**I])) < 0:
+            while MortonPoint(np.array(points[i]) ** np.ceil(set_radius(A_i))) < MortonPoint(np.array(points[i+2**I])):
                 I += 1
-            u = np.min(i + 2**I, len(points))
+            upper = np.min(i + 2**I, len(points))
+
+        # if p_i^-ceil(rad(A_i)) > p_i-k
+        if MortonPoint(np.array(points[i]) ** (-1 * np.ceil(set_radius(A_i)))) > MortonPoint(np.array(points[i-k])):
+            lower = i
+        else:
+            I = 0
+            while MortonPoint(np.array(points[i] ** (-1 * np.ceil(set_radius(A_i))))) > MortonPoint(np.array(points[i-2**I])):
+                I += 1
+            lower = np.max(i - 2**I, 0)
+        
+        if lower != upper:
+            csearch(points[i], lower, upper)
 
         
 
