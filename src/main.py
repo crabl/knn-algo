@@ -10,67 +10,8 @@ import numpy
 import sys
 import math
 import bitstring
-from hilbertIndex import *
-
-class MortonPoint:
-    def __init__(self, point):
-        self.point = point
-
-    # Override len to give us the number of dimensions in the point
-    def __len__(self):
-        return len(self.point)
-
-    # Override array subscript operator
-    def __getitem__(self, key):
-        return self.point[key]
-
-    # Test if two points have the same Morton order
-    def __eq__(self, other):
-        return self.point == other.point
-        
-    # Test for less than in terms of Morton ordering
-    def __lt__(self, other):
-        x = 0
-        dim = 0
-        for j in range(0, len(self)):
-            y = self.xor_msb(self[j], other[j])
-            if x < y:
-                x = y
-                dim = j
-    
-        return self[dim] < other[dim]
-
-    # Return the Most Significant Differing Bit of two integers
-    def msdb(self, a, b):
-        bit_num = 0
-        num = a ^ b # Bitwise XOR on a and b
-
-        # Shift until we reach the most significant bit
-        while num != 0:
-            bit_num += 1
-            num = num >> 1
-
-        return bit_num
-
-    # Return XOR of most significant bit between two floating point numbers
-    def xor_msb(self, a, b):
-        a = float(a)
-        b = float(b)
-        mantissa_a, exponent_a = math.frexp(a)
-        mantissa_b, exponent_b = math.frexp(b)
-        
-        if exponent_a == exponent_b:
-            # Need to get the integer mantissa, since math.frexp
-            # gives it to us as a float
-            int_mantissa_a = int(str(mantissa_a)[2:])
-            int_mantissa_b = int(str(mantissa_b)[2:])
-            most_sig_dif_bit = self.msdb(int_mantissa_a, int_mantissa_b)
-            return exponent_a - most_sig_dif_bit
-        
-        if exponent_b < exponent_a:
-            return exponent_a
-
-        return exponent_b
+from hilbert_index import *
+from morton_index import *
 
 # Euclidean distance between two points
 def distance(a, b):
@@ -99,10 +40,25 @@ def set_radius(S):
     distance_matrix.flat = [distance(p0, p1) for p0 in S for p1 in S]
     return np.max(distance_matrix)
 
+def construct_morton(points, k):
+    for i in range(len(points)):
+        A_i = set_knn(points[i], points[i-k, i+k])
+        u = 0
+        I = 0
+        # if p_i^ceil(rad(A_i)) < p_i+k
+        if cmp_zorder(np.array(points[i]) ** np.ceil(set_radius(A_i)), np.array(points[i+k])) < 0:
+            u = i
+        else:
+            I = 0
+            while cmp_zorder(np.array(points[i]) ** np.ceil(set_radius(A_i)), np.array(points[i+2**I])) < 0:
+                I += 1
+            u = np.min(i + 2**I, len(points))
+
+        
+
 def main():
     P = [(3,2),(1,7),(4,4),(6,1),(7,2),(2,5),(1,1)]
-    H = [hilbertIndex(2,8,point) for point in P]
-    hilbert_ordered = [p for (h,p) in sorted(zip(H, P))] # Sort the points in Hilbert order
+    hilbert_ordered = hilbert_index(P, 2, 8)
 
     print hilbert_ordered
     
