@@ -19,7 +19,7 @@ V_CONSTANT = 4 # Platform-dependent constant
 
 class MortonPoint:
     def __init__(self, point):
-        self.point = np.array(point)
+        self.point = np.array(point, dtype=np.uint32)
     
     def __lt__(self, other):
         if cmp_zorder(self.point, other.point) < 0:
@@ -43,7 +43,7 @@ def k_smallest_indices(k, S):
 
 # Find the k nearest neighbors to a point in a given set S
 def set_knn(point, k, S):
-    distance_array = [distance(p,s) for s in S]
+    distance_array = [distance(point,s) for s in S]
 
     # Find the indices of the k smallest items in S
     smallest_indices = k_smallest_indices(k, distance_array)
@@ -54,50 +54,53 @@ def set_knn(point, k, S):
 
 # The radius of a set is the largest distance between any two points in the set S
 def set_radius(S):
-    distance_matrix = np.zeros(len(S), len(S))
+    distance_matrix = np.zeros((len(S), len(S)))
     distance_matrix.flat = [distance(p0, p1) for p0 in S for p1 in S]
     return np.max(distance_matrix)
 
-def csearch(point, low, hi):
+def csearch(points, A_i, i, low, hi):
     if (hi-low) < V_CONSTANT:
-        
+        return A_i
 
 def construct_morton(points, k):
     for i in range(len(points)):
-        A_i = [points[i-k:i+k][index] for index in set_knn(points[i], points[i-k:i+k])]
+        A_i = set_knn(points[i], k, points[max(0,i-k):min(len(points),i+k)])
+        if len(A_i) < k:
+            A_i.append(points[i])
         upper = 0
         lower = 0
-
+        
+        print "Iteration:", i
+        print "point_i:", points[i]
+        print "A_i:", A_i
         # if p_i^ceil(rad(A_i)) < p_i+k
-        if MortonPoint(np.array(points[i]) ** np.ceil(set_radius(A_i))) < MortonPoint(np.array(points[i+k])):
+        if MortonPoint(np.array(points[i]) ** np.ceil(set_radius(A_i))) < MortonPoint(np.array(points[min(i+k, len(points)-1)])):
             upper = i
         else:
             I = 0
-            while MortonPoint(np.array(points[i]) ** np.ceil(set_radius(A_i))) < MortonPoint(np.array(points[i+2**I])):
+            while MortonPoint(np.array(points[i]) ** np.ceil(set_radius(A_i))) < MortonPoint(np.array(points[min(len(points)-1, i+2**I)])):
                 I += 1
-            upper = np.min(i + 2**I, len(points))
+            upper = min(i + 2**I, len(points)-1)
 
         # if p_i^-ceil(rad(A_i)) > p_i-k
-        if MortonPoint(np.array(points[i]) ** (-1 * np.ceil(set_radius(A_i)))) > MortonPoint(np.array(points[i-k])):
+        if MortonPoint(np.array(points[i]) ** (-1 * np.ceil(set_radius(A_i)))) > MortonPoint(np.array(points[max(0, i-k)])):
             lower = i
         else:
             I = 0
-            while MortonPoint(np.array(points[i] ** (-1 * np.ceil(set_radius(A_i))))) > MortonPoint(np.array(points[i-2**I])):
+            while MortonPoint(np.array(points[i] ** (-1 * np.ceil(set_radius(A_i))))) > MortonPoint(np.array(points[max(0, i-2**I)])):
                 I += 1
             lower = np.max(i - 2**I, 0)
-        
+
         if lower != upper:
-            csearch(points[i], lower, upper)
+            print "CSEARCH"
+            csearch(points, A_i, i, lower, upper)
 
         
 
 def main():
     P = [(3,2),(1,7),(4,4),(6,1),(7,2),(2,5),(1,1)]
-    hilbert_ordered = hilbert_index(P, 2, 8)
-
-    print hilbert_ordered
+    print construct_morton(P, 6)
     
-    print "Hello, world!"
 
 
 if __name__ == "__main__":
