@@ -74,9 +74,12 @@ def set_radius(S):
     distance_matrix.flat = [distance(p0, p1) for p0 in S for p1 in S]
     return np.max(distance_matrix)
 
-def csearch(points, A_i, i, low, hi):
+def csearch(point, A_i, i, k, low, hi):
     if (hi-low) < V_CONSTANT:
-        return A_i
+        return set_knn(point[i], k, list(set(A_i + point[low:hi])))
+    mid = int((hi + low) / 2)
+    A_i = set_knn(point[i], k, list(set(A_i + point[mid])))
+    
 
 def construct_morton(points, k):
     for i in range(len(points)):
@@ -109,7 +112,7 @@ def construct_morton(points, k):
 
         if lower != upper:
             print "CSEARCH"
-            csearch(points, A_i, i, lower, upper)
+            csearch(points, A_i, i, k, lower, upper)
 
         
 
