@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-# Perform Hilbert ordering on a set of vectors in n-dimensional space
-# and find k-nearest neighbors based on this ordering
+# Perform Hilbert & Z-orderings on a set of vectors in n-dimensional
+# space and find k-nearest neighbors based on this ordering
 
 # CPSC 4110 - Approximation Algorithms
 # Camara Lerner & Chris Rabl
@@ -28,6 +28,22 @@ class MortonPoint:
 
     def __eq__(self, other):
         if cmp_zorder(self.point, other.point) == 0:
+            return True
+        return False
+
+class HilbertPoint:
+    def __init__(self, point, precision):
+        self.point = np.array(point, dtype=np.uint32)
+        self.dimension = len(point)
+        self.precision = precision
+    
+    def __lt__(self, other):
+        if cmp_hilbert(self.point, other.point, self.dimension, self.precision) < 0:
+            return True
+        return False
+
+    def __eq__(self, other):
+        if cmp_hilbert(self.point, other.point, self.dimension, self.precision) == 0:
             return True
         return False
 
@@ -98,8 +114,8 @@ def construct_morton(points, k):
         
 
 def main():
-    P = [(3,2),(1,7),(4,4),(6,1),(7,2),(2,5),(1,1)]
-    print construct_morton(P, 6)
+    P = [(x,y) for x in range(16) for y in range(16)]
+    print construct_morton(P, 4)
     
 
 
