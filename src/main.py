@@ -123,8 +123,9 @@ def construct_morton(points, i, k):
         lower = np.max(i - 2**I, 0)
 
     if lower != upper:
-        csearch(points, A_i, i, k, lower, upper)
+        A_i = csearch(points, A_i, i, k, lower, upper)
 
+    return A_i
         
 
 def main():
