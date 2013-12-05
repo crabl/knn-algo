@@ -68,6 +68,9 @@ def set_knn(point, k, S):
     nearest_neighbors = [S[i] for i in smallest_indices]
     return nearest_neighbors
 
+def box_dist(point, box_center, box_radius):
+    return distance(point, box_center) - box_radius # This is roughly incorrect... Although it's a circle. So yeah.
+
 # The radius of a set is the largest distance between any two points in the set S
 def set_radius(S):
     distance_matrix = np.zeros((len(S), len(S)))
@@ -79,7 +82,17 @@ def csearch(point, A_i, i, k, low, hi):
         return set_knn(point[i], k, list(set(A_i + point[low:hi])))
     mid = int((hi + low) / 2)
     A_i = set_knn(point[i], k, list(set(A_i + point[mid])))
-    
+    if box_dist(point[i], point[low], dist(point[low], point[hi])) > set_radius(A_i):
+        return A_i
+    if MortonPoint(point[i]) < MortonPoint(point[m]):
+        A_i = csearch(point, A_i, i, k, low, mid - 1)
+        if MortonPoint(point[m]) < MortonPoint(point[i] ** np.ceil(set_radius(A_i))):
+            A_i = csearch(point, A_i, i, k, mid + 1, hi)
+    else:
+        A_i = csearch(point, A_i, i, k, mid + 1, hi)
+        if MortonPoint(point[i] ** (-1 * np.ceil(set_radius(A_i)))):
+            A_i = csearch(point, A_i, i, low, mid - 1)
+    return A_i
 
 def construct_morton(points, k):
     for i in range(len(points)):
