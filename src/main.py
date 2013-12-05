@@ -94,44 +94,43 @@ def csearch(point, A_i, i, k, low, hi):
             A_i = csearch(point, A_i, i, low, mid - 1)
     return A_i
 
-def construct_morton(points, k):
-    for i in range(len(points)):
-        A_i = set_knn(points[i], k, points[max(0,i-k):min(len(points),i+k)])
-        if len(A_i) < k:
-            A_i.append(points[i])
-        upper = 0
-        lower = 0
+def construct_morton(points, i, k):
+    A_i = set_knn(points[i], k, points[max(0,i-k):min(len(points),i+k)])
+    if len(A_i) < k:
+        A_i.append(points[i])
+    upper = 0
+    lower = 0
         
-        print "Iteration:", i
-        print "point_i:", points[i]
-        print "A_i:", A_i
-        # if p_i^ceil(rad(A_i)) < p_i+k
-        if MortonPoint(np.array(points[i]) ** np.ceil(set_radius(A_i))) < MortonPoint(np.array(points[min(i+k, len(points)-1)])):
-            upper = i
-        else:
-            I = 0
-            while MortonPoint(np.array(points[i]) ** np.ceil(set_radius(A_i))) < MortonPoint(np.array(points[min(len(points)-1, i+2**I)])):
-                I += 1
-            upper = min(i + 2**I, len(points)-1)
+    #print "Iteration:", i
+    #print "point_i:", points[i]
+    #print "A_i:", A_i
+    # if p_i^ceil(rad(A_i)) < p_i+k
+    if MortonPoint(np.array(points[i]) ** np.ceil(set_radius(A_i))) < MortonPoint(np.array(points[min(i+k, len(points)-1)])):
+        upper = i
+    else:
+        I = 0
+        while MortonPoint(np.array(points[i]) ** np.ceil(set_radius(A_i))) < MortonPoint(np.array(points[min(len(points)-1, i+2**I)])):
+            I += 1
+        upper = min(i + 2**I, len(points)-1)
 
-        # if p_i^-ceil(rad(A_i)) > p_i-k
-        if MortonPoint(np.array(points[i]) ** (-1 * np.ceil(set_radius(A_i)))) > MortonPoint(np.array(points[max(0, i-k)])):
-            lower = i
-        else:
-            I = 0
-            while MortonPoint(np.array(points[i] ** (-1 * np.ceil(set_radius(A_i))))) > MortonPoint(np.array(points[max(0, i-2**I)])):
-                I += 1
-            lower = np.max(i - 2**I, 0)
+    # if p_i^-ceil(rad(A_i)) > p_i-k
+    if MortonPoint(np.array(points[i]) ** (-1 * np.ceil(set_radius(A_i)))) > MortonPoint(np.array(points[max(0, i-k)])):
+        lower = i
+    else:
+        I = 0
+        while MortonPoint(np.array(points[i] ** (-1 * np.ceil(set_radius(A_i))))) > MortonPoint(np.array(points[max(0, i-2**I)])):
+            I += 1
+        lower = np.max(i - 2**I, 0)
 
-        if lower != upper:
-            print "CSEARCH"
-            csearch(points, A_i, i, k, lower, upper)
+    if lower != upper:
+        csearch(points, A_i, i, k, lower, upper)
 
         
 
 def main():
     P = [(x,y) for x in range(16) for y in range(16)]
-    print construct_morton(P, 4)
+    for i in range(len(P)):
+        print P[i], "NN:", construct_morton(P, i, 4)
     
 
 
