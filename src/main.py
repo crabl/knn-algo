@@ -11,6 +11,7 @@ import sys
 import math
 import bitstring
 import numpy as np
+import time
 
 from hilbert_index import *
 from morton_index import *
@@ -129,10 +130,24 @@ def construct_morton(points, i, k):
         
 
 def main():
-    P = [(x,y) for x in range(16) for y in range(16)]
+    P = [(x,y,z) for x in range(10) for y in range(10) for z in range(10)]
+    t_cum_aknn = 0
+    t_cum_knn = 0
+    k = 4
     for i in range(len(P)):
-        print P[i], "NN:", construct_morton(P, i, 4)
-    
+        t0_aknn = time.time()
+        AKNN_i = construct_morton(P, i, k)
+        tf_aknn = time.time() - t0_aknn
+        t_cum_aknn += tf_aknn
+
+        t0_knn = time.time()
+        KNN_i = set_knn(P[i], k, P)
+        tf_knn = time.time() - t0_knn
+        t_cum_knn += tf_knn
+        print P[i], "\tAkNN:", AKNN_i, "\tOPT:", KNN_i
+    print ""
+    print "Time AKNN:", t_cum_aknn
+    print "Time OPT:", t_cum_knn
 
 
 if __name__ == "__main__":
