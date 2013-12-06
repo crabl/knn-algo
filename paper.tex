@@ -8,6 +8,8 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{wasysym}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 \newcommand{\etal}{\emph{et al.}}
 
@@ -28,7 +30,10 @@
 
 \section{Hilbert Curve}
 
-The Hilbert Curve is a space filling curve that makes the next point in the curve only one unit distance from the previous point. The algorithm for calculating the Hilbert Curve used is found in~\cite{Hamilton:2006}.
+The Hilbert Curve is a space filling curve that makes the next point in the curve only one unit distance from the previous point. The curve is defined based onthe amount of space the curve fills. The space that the curve fills can be in any dimensionally space $(n)$ with the length of each dimension filled equal to $2^m$. This means that for each point in the curve the maximum bit size for each dimension is $(m)$~\cite{Hamilton:2006}. 
+
+The curve labels the points from $0$ to $2^{m*n} - 1$ in the order that the curve visits each point. The Hilbert Curve considered here will start in the bottom left hand corner and finishes in the upper left corner. 
+ 
 
 \flushleft
 Formula for Gray Code is in \ref{gray-code}.
@@ -75,50 +80,44 @@ Formula for $e$ is displayed in \ref{e}.
 
 
 
-\begin{table}
-  \flushleft
-  \begin{tabular}{l}
-    \hline
-    Given $g \in \mathbb{N}$, calculates the $i \in \mathbb{N}$ such that $gc\left( i \right) = g $ \\
-    {\bf Input:} $g \in \mathbb{N}$\\
-    {\bf Output:} $i \in \mathbb{N}$ such that $gc \left( i \right) = g $\\
-    1: $ m \leftarrow $ number of bits to represent $g$ \\
-    2: $ \left( i, j \right) \leftarrow \left( g, 1 \right) $ \\
-    3: {\bf while} $ j < m $ {\bf do} \\
-    4: \qquad $ i \leftarrow i \oplus \left( g \gg j \right)$ \\
-    5: \qquad $ j \leftarrow j + 1$ \\
-    6: {\bf end while} \\
-    \hline
+\begin{algorithm}
+  \caption{The algorithm for calculating the Gray Code Inverse.     Given $g \in \mathbb{N}$, calculates the $i \in \mathbb{N}$ such that $gc\left( i \right) = g $ }
+  \label{gray-code-inverse}
+  \begin{algorithmic}[1]
+    \Require $g \in \mathbb{N}$
+    \Return $i \in \mathbb{N} \text{ such that } gc \left( i \right) = g $
+    \State $ m \leftarrow \text{ number of bits to represent } g$ 
+    \State $ \left( i, j \right) \leftarrow \left( g, 1 \right) $ 
+    \While{$ j < m $ }
+    \State $ i \leftarrow i \oplus \left( g \gg j \right)$ 
+    \State $ j \leftarrow j + 1$ 
+    \EndWhile
     % \oplus is exclusive or
     % \ll left shift
     % \gg right shift
     % \mid bitwise or
-  \end{tabular}
-  \caption{The algorithm for calculating the Gray Code Inverse. }
-  \label{gray-code-inverse}
-\end{table}
+  \end{algorithmic}
+\end{algorithm}
 
-\begin{table}
-  
-  \begin{tabular}{l}
-    \hline
-    Calculates the Hilbert index corresponding to the point ${\bf p} \in \mathbb{N}^n $ \\
-    {\bf Input:} $n, m \in \mathbb{N} - \{0\} $ and a point ${\bf p} \in \mathbb{N}^n$ \\
-    {\bf Output:} $h \in \mathbb{N}$, the Hilbert index of the point ${\bf p}$. \\
-    1: $ \left( h, e, d \right) \leftarrow \left( 0, 0, 0 \right) $ \\
-    2: {\bf for} $ i = m - 1 $ to $ 0 $ { \bf do} \\
-    3: \qquad $ l \leftarrow \left[ \left( p_{n-1} , i \right) \ldots \left( p_0 , i \right) \right]_{\left[ 2 \right]} $ \\
-    4: \qquad $ l \leftarrow \left( b \oplus e \right) \rightturn \left( d+1 \right)$ \\
-    5: \qquad $ w \leftarrow gc^{-1} \left( l \right)$ \\
-    6: \qquad $ e \leftarrow e \oplus \left( e \left( w \right) \leftturn \left( d+ 1 \right) \right) $ \\
-    7: \qquad $ d \leftarrow d + d \left( w \right) + 1 $ mod $n$ \\
-    8: \qquad $ h \leftarrow \left( h \ll n \right) | w $ \\
-    9: {\bf end for} \\
-    \hline
-  \end{tabular}
-  \caption{The algorithm for calculating the hilbert index given any dimensional point as long as the bits used within an index of the hilbert curve space is specified in ($m$). }
+\begin{algorithm}
+  \caption{Calculating the Hilbert index given any dimensional point ${\bf p}$ 
+    of size $n$ as long as the bits used within an index of the hilbert curve 
+    space is specified in ($m$).}
   \label{hilbert-point-to-index}
-\end{table}
+  \begin{algorithmic}[1]
+    \Require $n, m \in \mathbb{N} - \{0\} \text{ and a point } {\bf p} \in \mathbb{N}^n$
+    \Return $h \in \mathbb{N} \text{, the Hilbert index of the point }{\bf p}$
+    \State $ \left( h, e, d \right) \leftarrow \left( 0, 0, 0 \right) $
+    \For{$j\gets m - 1, 0$} 
+    \State $ l \leftarrow \left[ \left( p_{n-1} , i \right) \ldots \left( p_0 , i \right) \right]_{\left[ 2 \right]} $ 
+    \State $ l \leftarrow \left( b \oplus e \right) \rightturn \left( d+1 \right)$ 
+    \State $ w \leftarrow gc^{-1} \left( l \right)$ 
+    \State $ e \leftarrow e \oplus \left( e \left( w \right) \leftturn \left( d+ 1 \right) \right) $ 
+    \State $ d \leftarrow d + d \left( w \right) + 1 \text{ mod }n$ 
+    \State $ h \leftarrow \left( h \ll n \right) | w $
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
 
 \bibliographystyle{amsplain}
 \bibliography{mybiblio}
