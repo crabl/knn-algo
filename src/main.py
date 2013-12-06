@@ -17,10 +17,7 @@ import warnings
 # Ignore exponent divide-by-zero warning
 warnings.simplefilter("ignore", RuntimeWarning) 
 
-from hilbert import *
-from morton import *
-
-
+from point import *
 
 V_CONSTANT = 4 # Platform-dependent constant
 
