@@ -153,8 +153,10 @@ def main():
     P = [(x,y,z) for x in range(10) for y in range(10) for z in range(10)]
     t_cum_aknn = 0
     t_cum_knn = 0
-    k = 6
+    k = 26
     precision = 32
+
+    average_correct = 0
     for i in range(len(P)):
         t0_aknn = time.time()
         AKNN_i = construct_morton(P, i, k)
@@ -165,11 +167,16 @@ def main():
         KNN_i = set_knn(P[i], k, P)
         tf_knn = time.time() - t0_knn
         t_cum_knn += tf_knn
-        print P[i], "\tAkNN:", AKNN_i, "\tOPT:", KNN_i
+        
+        num_correct = sum([item in AKNN_i for item in KNN_i])
+        average_correct += num_correct
+        print P[i], "\tCorrect:", num_correct, "/", len(KNN_i)
     print ""
-    print "Time AKNN:", t_cum_aknn
+    print "Time Morton AKNN:", t_cum_aknn
     print "Time OPT:", t_cum_knn
+    print "Average Correct:", average_correct / len(P)
 
+    average_correct = 0
     for i in range(len(P)):
         t0_aknn = time.time()
         AKNN_i = construct_hilbert(P, i, k, precision)
@@ -180,10 +187,14 @@ def main():
         KNN_i = set_knn(P[i], k, P)
         tf_knn = time.time() - t0_knn
         t_cum_knn += tf_knn
-        print P[i], "\tAkNN:", AKNN_i, "\tOPT:", KNN_i
+        
+        num_correct = sum([item in AKNN_i for item in KNN_i])
+        average_correct += num_correct
+        print P[i], "\tCorrect:", num_correct, "/", len(KNN_i)
     print ""
-    print "Time AKNN:", t_cum_aknn
+    print "Time Hilbert AKNN:", t_cum_aknn
     print "Time OPT:", t_cum_knn
+    print "Average Correct:", average_correct / len(P)
 
 
 if __name__ == "__main__":

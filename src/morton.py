@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # Stolen from Wikipedia
 
+import numpy as np
+
 def less_msb(x, y):
     return x < y and x < (x ^ y)
 
