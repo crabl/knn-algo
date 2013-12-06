@@ -28,37 +28,56 @@
 
 \section{Hilbert Curve}
 
+The Hilbert Curve is a space filling curve that makes the next point in the curve only one unit distance from the previous point. The algorithm for calculating the Hilbert Curve used is found in~\cite{Hamilton:2006}.
 
-Formula for Gray Code:
-$ gc(i) = i \oplus \left( i \gg 1 \right)$ 
+\flushleft
+Formula for Gray Code is in \ref{gray-code}.
+\begin{equation}
+  \label{gray-code}
+  gc(i) = i \oplus \left( i \gg 1 \right) 
+\end{equation}
 
-Formula for $g(i) = \lfloor \log _{2} \left( gc(i) \oplus gc(i+1) \right) \rfloor + 1$
+Formula for $g$ is displayed in \ref{g}.
+\begin{equation}
+  \label{g}
+  g(i) = \lfloor \log _{2} \left( gc(i) \oplus gc(i+1) \right) \rfloor + 1
+\end{equation}
 
-Formula for
-\[ d(i) = \left\{ 
-  \begin{array}{l l}
-    0 & \quad \text{if $i = 0$}\\
-    g(i - 1) \text{ mod } n & \quad \text{if $i$ is even} \\
-    g(i) \text{ mod }  n & \quad \text{if $i$ is odd}
-  \end{array} \right.\]
 
-Formula for the bitwise right rotation:
-$a \rightturn i = \left[ a_{n - 1 + i\text{ mod }n} \ldots a_{i\text{ mod }n} \right]_{\left[ 2 \right]}, \text{ where } a = \left[ a_{n-1} \ldots a_0\right]_{\left[ 2 \right]} $
+Formula for $d(i)$ is displayed in \ref{d}.
+\begin{equation}
+  \label{d}
+  d(i) = 
+    \begin{cases}
+      0 & \quad \text{if $i = 0$}\\
+      g(i - 1) \text{ mod } n & \quad \text{if $i$ is even} \\
+      g(i) \text{ mod }  n & \quad \text{if $i$ is odd}
+    \end{cases}
+\end{equation}
 
-The bitwise left rotation is similar.
 
-Formula for 
-\[ e(i) = \left\{ 
-  \begin{array}{l l}
-    0 & \quad \text{if $i = 0$}\\
-    e(i - 1) \oplus 2^{d(i-1)} \oplus 2^{g(i-1)}& \quad \text{otherwise} \\
-  \end{array} \right.\]
+Formula for the bitwise right rotation is displayed in \ref{right-rotate}. The bitwise left rotation is similar.
+\begin{equation}
+  \label{right-rotate}
+  a \rightturn i = \left[ a_{n - 1 + i\text{ mod }n} \ldots a_{i\text{ mod }n} \right]_{\left[ 2 \right]}, \text{ where } a = \left[ a_{n-1} \ldots a_0\right]_{\left[ 2 \right]} 
+\end{equation}
+
+
+Formula for $e$ is displayed in \ref{e}.
+\begin{equation}
+  \label{e}
+  e(i) =  
+    \begin{cases}
+      0 & \quad \text{if $i = 0$}\\
+      e(i - 1) \oplus 2^{d(i-1)} \oplus 2^{g(i-1)}& \quad \text{otherwise} \\
+    \end{cases}
+\end{equation}
+
+
 
 \begin{table}
-
+  \flushleft
   \begin{tabular}{l}
-    \hline
-    Algorithm for Gray Code Inverse $\left( gc^{-1}\left( g \right) \right)$\\
     \hline
     Given $g \in \mathbb{N}$, calculates the $i \in \mathbb{N}$ such that $gc\left( i \right) = g $ \\
     {\bf Input:} $g \in \mathbb{N}$\\
@@ -66,8 +85,8 @@ Formula for
     1: $ m \leftarrow $ number of bits to represent $g$ \\
     2: $ \left( i, j \right) \leftarrow \left( g, 1 \right) $ \\
     3: {\bf while} $ j < m $ {\bf do} \\
-    4: {     } $ i \leftarrow i \oplus \left( g \gg j \right)$ \\
-    5: {     } $ j \leftarrow j + 1$ \\
+    4: \qquad $ i \leftarrow i \oplus \left( g \gg j \right)$ \\
+    5: \qquad $ j \leftarrow j + 1$ \\
     6: {\bf end while} \\
     \hline
     % \oplus is exclusive or
@@ -75,6 +94,7 @@ Formula for
     % \gg right shift
     % \mid bitwise or
   \end{tabular}
+  \caption{The algorithm for calculating the Gray Code Inverse. }
   \label{gray-code-inverse}
 \end{table}
 
@@ -82,22 +102,21 @@ Formula for
   
   \begin{tabular}{l}
     \hline
-    Algorithm for Hilbert Index $(hi(n, m, {\bf p}))$ \\
-    \hline
     Calculates the Hilbert index corresponding to the point ${\bf p} \in \mathbb{N}^n $ \\
     {\bf Input:} $n, m \in \mathbb{N} - \{0\} $ and a point ${\bf p} \in \mathbb{N}^n$ \\
     {\bf Output:} $h \in \mathbb{N}$, the Hilbert index of the point ${\bf p}$. \\
     1: $ \left( h, e, d \right) \leftarrow \left( 0, 0, 0 \right) $ \\
     2: {\bf for} $ i = m - 1 $ to $ 0 $ { \bf do} \\
-    3: {     } $ l \leftarrow \left[ \left( p_{n-1} , i \right) \ldots \left( p_0 , i \right) \right]_{\left[ 2 \right]} $ \\
-    4: {     } $ l \leftarrow \left( b \oplus e \right) \rightturn \left( d+1 \right)$ \\
-    5: {     } $ w \leftarrow gc^{-1} \left( l \right)$ \\
-    6: {     } $ e \leftarrow e \oplus \left( e \left( w \right) \leftturn \left( d+ 1 \right) \right) $ \\
-    7: {     } $ d \leftarrow d + d \left( w \right) + 1 $ mod $n$ \\
-    8: {     } $ h \leftarrow \left( h \ll n \right) | w $ \\
+    3: \qquad $ l \leftarrow \left[ \left( p_{n-1} , i \right) \ldots \left( p_0 , i \right) \right]_{\left[ 2 \right]} $ \\
+    4: \qquad $ l \leftarrow \left( b \oplus e \right) \rightturn \left( d+1 \right)$ \\
+    5: \qquad $ w \leftarrow gc^{-1} \left( l \right)$ \\
+    6: \qquad $ e \leftarrow e \oplus \left( e \left( w \right) \leftturn \left( d+ 1 \right) \right) $ \\
+    7: \qquad $ d \leftarrow d + d \left( w \right) + 1 $ mod $n$ \\
+    8: \qquad $ h \leftarrow \left( h \ll n \right) | w $ \\
     9: {\bf end for} \\
     \hline
   \end{tabular}
+  \caption{The algorithm for calculating the hilbert index given any dimensional point as long as the bits used within an index of the hilbert curve space is specified in ($m$). }
   \label{hilbert-point-to-index}
 \end{table}
 
