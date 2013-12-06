@@ -17,10 +17,7 @@ import warnings
 # Ignore exponent divide-by-zero warning
 warnings.simplefilter("ignore", RuntimeWarning) 
 
-from hilbert import *
-from morton import *
-
-
+from point import *
 
 V_CONSTANT = 4 # Platform-dependent constant
 
@@ -164,7 +161,7 @@ def main(file_name, k):
     t_cum_knn = 0
     k = int(k)
     precision = 32
-
+    """
     print "Running Z-order AKNN comparison on", len(P), "points..."
     average_distance_from_opt = 0
     for i in range(len(P)):
@@ -190,7 +187,9 @@ def main(file_name, k):
     print "Time Morton AKNN:", t_cum_aknn
     print "Time OPT:", t_cum_knn
     print "Average times distance from OPT:", average_distance_from_opt / len(P)
-
+    """
+    print "Constructing Hilbert Ordering..."
+    hilbert_index(P, len(P[0]), precision)
     t_cum_aknn = 0
     t_cum_knn = 0
     print ""
