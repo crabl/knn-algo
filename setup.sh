@@ -12,3 +12,6 @@ export PYTHONPATH=$PYTHONPATH:$HOME/local/lib/python2.6/site-packages
 echo "Installing prerequisites..."
 echo "python-bitstring"
 easy_install --prefix="$HOME/local" bitstring
+
+echo "numpy"
+easy_install --prefix="$HOME/local" numpy

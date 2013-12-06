@@ -13,40 +13,10 @@ import bitstring
 import numpy as np
 import time
 
-from hilbert_index import *
-from morton_index import *
+from hilbert import *
+from morton import *
 
 V_CONSTANT = 4 # Platform-dependent constant
-
-class MortonPoint:
-    def __init__(self, point):
-        self.point = np.array(point, dtype=np.uint32)
-    
-    def __lt__(self, other):
-        if cmp_zorder(self.point, other.point) < 0:
-            return True
-        return False
-
-    def __eq__(self, other):
-        if cmp_zorder(self.point, other.point) == 0:
-            return True
-        return False
-
-class HilbertPoint:
-    def __init__(self, point, precision):
-        self.point = np.array(point, dtype=np.uint32)
-        self.dimension = len(point)
-        self.precision = precision
-    
-    def __lt__(self, other):
-        if cmp_hilbert(self.point, other.point, self.dimension, self.precision) < 0:
-            return True
-        return False
-
-    def __eq__(self, other):
-        if cmp_hilbert(self.point, other.point, self.dimension, self.precision) == 0:
-            return True
-        return False
 
 # Euclidean distance between two points
 def distance(a, b):

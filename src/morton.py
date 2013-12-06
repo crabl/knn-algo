@@ -1,22 +1,34 @@
-import numpy as np
-from zorder import *
+#!/usr/bin/env python
+# Stolen from Wikipedia
 
-def morton_order(points):
-    order_map = dict(zip(range(1, len(points)+1), points))
-    dims = len(points[0])
-    matrix_size = max([max(item) for item in zip(*points)])+1
-    M = np.zeros([matrix_size for i in range(dims)], dtype=int)
-    for key in order_map:
-        M[order_map[key]] = key
-    print M
-    zorder(M)
-    zordered_array = []
-    for m in M.flat:
-        if m != 0:
-            zordered_array.append(order_map[m])
+def less_msb(x, y):
+    return x < y and x < (x ^ y)
 
-    return zordered_array
+def cmp_zorder(a, b):
+    j = 0
+    k = 0
+    x = 0
+    dim = len(a)
+    for k in range(dim):
+        y = a[k] ^ b[k]
+        if less_msb(x, y):
+            j = k
+            x = y
+    return a[j] - b[j]
 
+def morton_index(points):
+    return sorted(points, cmp=cmp_zorder)
 
+class MortonPoint:
+    def __init__(self, point):
+        self.point = np.array(point, dtype=np.uint32)
     
-    
+    def __lt__(self, other):
+        if cmp_zorder(self.point, other.point) < 0:
+            return True
+        return False
+
+    def __eq__(self, other):
+        if cmp_zorder(self.point, other.point) == 0:
+            return True
+        return False
