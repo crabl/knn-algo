@@ -37,10 +37,7 @@ class Point(object):
         return morton.cmp_zorder(self.coordinates, other.coordinates) < 0
 
     def __eq__(self, other):
-        self.check_valid()
-        if self.sftype == 'hilbert':
-            return self.index_hilbert() == other.index_hilbert()
-        return morton.cmp_zorder(self.coordinates, other.coordinates) == 0
+        return self.coordinates == other.coordinates
 
     def __pow__(self, power):
         result = Point(tuple([x ** power for x in self.coordinates]), precision=self.precision, sftype=self.sftype)
@@ -57,3 +54,6 @@ class Point(object):
 
     def __repr__(self):
         return str(self.coordinates)
+
+def cmp_hilbert(a, b):
+    return a.index_hilbert() - b.index_hilbert()

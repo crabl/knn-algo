@@ -39,7 +39,11 @@ def set_knn(point, k, S):
     smallest_indices = k_smallest_indices(k, distances)
 
     # Find the points corresponding to those indices
-    nearest_neighbors = [S[i] for i in smallest_indices]
+    nearest_neighbors = []
+    for i in smallest_indices:
+        if S[i] != point:
+            nearest_neighbors.append(S[i])
+
     return nearest_neighbors
 
 def box_dist(point, box_center, box_radius):
@@ -52,7 +56,7 @@ def set_radius(S):
 
 def csearch(point, A_i, i, k, low, hi):
     if (hi-low) < V_CONSTANT:
-        return set_knn(point[i], k, list(set(A_i + point[low:hi])))
+        return set_knn(point[i], k, list(set(A_i + point[low:hi+1])))
 
     mid = int((hi + low) / 2)
     A_i = set_knn(point[i], k, list(set(A_i + [point[mid]])))
@@ -80,20 +84,20 @@ def construct(points, i, k):
     #print "point_i:", points[i]
     #print "A_i:", A_i
     # if p_i^ceil(rad(A_i)) < p_i+k
-    if points[i].shift(math.ceil(set_radius(A_i))) < points[min(i+k, len(points)-1)]:
+    if points[i].shift(math.ceil(set_radius(A_i))) < points[min(len(points)-1, i+k)]:
         upper = i
     else:
         I = 0
-        while points[i].shift(math.ceil(set_radius(A_i))) < points[min(len(points)-1, i+2**I)]:
+        while points[i].shift(math.ceil(set_radius(A_i))) < points[i+2**I-1]:
             I += 1
         upper = min(i + 2**I, len(points)-1)
 
     # if p_i^-ceil(rad(A_i)) > p_i-k
-    if points[i].shift(-1 * math.ceil(set_radius(A_i))) > points[max(0, i-k)]:
+    if points[i].shift(-1 * math.ceil(set_radius(A_i))) > points[i-k]:
         lower = i
     else:
         I = 0
-        while points[i].shift(-1 * math.ceil(set_radius(A_i))) > points[max(0, i-2**I)]:
+        while points[i].shift(-1 * math.ceil(set_radius(A_i))) > points[i-2**I]:
             I += 1
         lower = max(i - 2**I, 0)
 
@@ -108,6 +112,7 @@ def main(file_name, k):
     #dataset = np.genfromtxt(str(file_name), delimiter="\t", dtype=np.uint32)
 
     HP = [Point(item, sftype='hilbert') for item in dataset]
+    HP.sort(cmp=cmp_hilbert)
     MP = [Point(item, sftype='morton') for item in dataset]
 
     t_cum_aknn = 0

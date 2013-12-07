@@ -2,11 +2,17 @@ from point import *
 import unittest
 
 class PointTests(unittest.TestCase):
+    a = Point((1,1,1))
+    b = Point((1,1,2))
+    
     def create_invalid(self):
         return Point((0,0,0), sftype='invalid')
     
     def test_create_invalid(self):
         self.assertRaises(ValueError, self.create_invalid)
+
+    def test_not_equal(self):
+        self.assertEqual(self.a != self.b, True)
 
 class HilbertPointTests(unittest.TestCase):
     a = Point((1,0,1), sftype='hilbert')
