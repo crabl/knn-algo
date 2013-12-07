@@ -57,3 +57,6 @@ class Point(object):
 
 def cmp_hilbert(a, b):
     return a.index_hilbert() - b.index_hilbert()
+
+def cmp_zorder(a, b):
+    return morton.cmp_zorder(a.coordinates, b.coordinates)

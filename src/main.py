@@ -47,7 +47,7 @@ def set_knn(point, k, S):
     return nearest_neighbors
 
 def box_dist(point, box_center, box_radius):
-    return distance(point, box_center) - box_radius # This is roughly incorrect... Although it's a circle. So yeah.
+    return distance(point, box_center) - box_radius # This is correct... Although it's a circle. So yeah.
 
 # The radius of a set is the largest distance between any two points in the set S
 def set_radius(S):
@@ -108,12 +108,18 @@ def construct(points, i, k):
         
 
 def main(file_name, k):
-    dataset = [(x,y) for x in range(20) for y in range(20)]
-    #dataset = np.genfromtxt(str(file_name), delimiter="\t", dtype=np.uint32)
+    #dataset = [(x,y) for x in range(20) for y in range(20)]
+    dataset = np.genfromtxt(str(file_name), delimiter="\t", dtype=np.uint32)
 
+    print "Generating Hilbert points..."
     HP = [Point(item, sftype='hilbert') for item in dataset]
+    print "Sorting..."
     HP.sort(cmp=cmp_hilbert)
+
+    print "Generating Morton points..."
     MP = [Point(item, sftype='morton') for item in dataset]
+    print "Sorting..."
+    MP.sort(cmp=cmp_zorder)
 
     t_cum_aknn = 0
     t_cum_knn = 0
@@ -170,7 +176,7 @@ def main(file_name, k):
         t_cum_knn += tf_knn
         
         average_distance_from_opt += set_radius(AKNN_i) / set_radius(KNN_i)
-        print HP[i], "\tAKNN:", AKNN_i, "\tOPT:", KNN_i
+        #print HP[i], "\tAKNN:", AKNN_i, "\tOPT:", KNN_i
     print ""
     print "Time Hilbert AKNN:", t_cum_aknn
     print "Time OPT:", t_cum_knn
