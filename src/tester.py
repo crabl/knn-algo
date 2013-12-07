@@ -88,7 +88,7 @@ class AlgorithmCorrectnessTests(unittest.TestCase):
         correct = [[(0, 1), (1, 0), (1, 1)],
         [(1, 1), (0, 0), (0, 2), (1, 0)],
         [(1, 1), (0, 0), (0, 1), (0, 2)],
-        [(0, 1), (1, 0), (1, 2), (0, 0)],
+        [(0, 1), (1, 0), (1, 2), (0, 2)],
         [(0, 1), (1, 2), (0, 3), (1, 1)],
         [(0, 2), (1, 3), (1, 2), (0, 1)],
         [(1, 1), (0, 2), (1, 3), (0, 3)],
@@ -96,7 +96,7 @@ class AlgorithmCorrectnessTests(unittest.TestCase):
         [(2, 1), (3, 0), (3, 1), (1, 2)],
         [(2, 0), (3, 1), (2, 2), (3, 0)],
         [(2, 0), (3, 1), (2, 1), (2, 2)],
-        [(3, 2), (2, 1), (3, 0), (2, 0)],
+        [(3, 2), (2, 1), (3, 0), (2, 2)],
         [(3, 2), (2, 1), (2, 3), (3, 1)],
         [(2, 2), (3, 3), (3, 2), (2, 1)],
         [(2, 2), (3, 1), (3, 3), (2, 3)],
@@ -108,7 +108,7 @@ class AlgorithmCorrectnessTests(unittest.TestCase):
                 temp_arr.append(Point(p, sftype='morton'))
             valid.append(temp_arr)
 
-        for i in range(len(self.HP)):
+        for i in range(len(self.MP)):
             self.assertEqual(all([p in valid[i] for p in construct(self.MP, i, self.k)]), True)
 
 
