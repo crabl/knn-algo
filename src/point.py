@@ -4,32 +4,41 @@ import hilbert
 import morton
 
 class Point(object):
-    def __init__(self, coordinates, precision=32, sftype="hilbert"):
-        self.coordinates = coordinates # Tuple of point coordinates
+    def __init__(self, coordinates, precision=32, sftype='hilbert'):
+        self.coordinates = tuple([int(item) for item in coordinates]) # Tuple of point coordinates
         self.dimension = len(coordinates)
         self.precision = precision
         self.sftype = sftype.lower()
-        if not self.sftype in ["hilbert", "morton"]:
-            raise ValueError("Point type must be either Hilbert or Morton")
+        if not self.sftype in ['hilbert', 'morton']:
+            raise ValueError('Point type must be either Hilbert or Morton')
         
     def check_valid(self):
         if any([x < 0 for x in self.coordinates]):
-            raise ValueError("Cannot get Hilbert index of negative point")
-
+            #raise ValueError('Cannot get Hilbert index of negative point')
+            return False
+        return True
 
     def index_hilbert(self):
-        self.check_valid()
+        if not self.check_valid():
+            return -1
         return hilbert.hilbert_index(self.dimension, self.precision, self.coordinates)
+
+    def sum(self):
+        return sum(self.coordinates)
+
+    def shift(self, amount):
+        result = Point(tuple([x + amount for x in self.coordinates]), precision=self.precision, sftype=self.sftype)
+        return result
     
     def __lt__(self, other):
         self.check_valid()
-        if self.sftype == "hilbert":
+        if self.sftype == 'hilbert':
             return self.index_hilbert() < other.index_hilbert()
         return morton.cmp_zorder(self.coordinates, other.coordinates) < 0
 
     def __eq__(self, other):
         self.check_valid()
-        if self.sftype == "hilbert":
+        if self.sftype == 'hilbert':
             return self.index_hilbert() == other.index_hilbert()
         return morton.cmp_zorder(self.coordinates, other.coordinates) == 0
 
@@ -38,13 +47,13 @@ class Point(object):
         return result
 
     def __add__(self, other):
-        return Point(tuple([self[i] - other[i] for i in range(self.dimensions)]), precision=self.precision, sftype=self.sftype)
+        return Point(tuple([self[i] - other[i] for i in range(self.dimension)]), precision=self.precision, sftype=self.sftype)
     
     def __sub__(self, other):
-        return Point(tuple([self[i] - other[i] for i in range(self.dimensions)]), precision=self.precision, sftype=self.sftype)
+        return Point(tuple([self[i] - other[i] for i in range(self.dimension)]), precision=self.precision, sftype=self.sftype)
 
-    def sum(self):
-        return sum(self.coordinates)
+    def __getitem__(self, i):
+            return self.coordinates[i]
 
     def __repr__(self):
         return str(self.coordinates)

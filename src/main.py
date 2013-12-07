@@ -15,7 +15,7 @@ import time
 import warnings
 
 # Ignore exponent divide-by-zero warning
-warnings.simplefilter("ignore", RuntimeWarning) 
+#warnings.simplefilter("ignore", RuntimeWarning) 
 
 from point import *
 
@@ -23,7 +23,7 @@ V_CONSTANT = 4 # Platform-dependent constant
 
 # Euclidean distance between two points
 def distance(a, b):
-    return np.sqrt(((np.array(a)-np.array(b))**2).sum())
+    return math.sqrt(((a - b) ** 2).sum())
 
 # Find the indices of the k smallest items in a set S, assuming that S contains a zero element
 def k_smallest_indices(k, S):
@@ -33,10 +33,10 @@ def k_smallest_indices(k, S):
 
 # Find the k nearest neighbors to a point in a given set S
 def set_knn(point, k, S):
-    distance_array = [distance(point,s) for s in S]
+    distances = [distance(point,s) for s in S]
 
     # Find the indices of the k smallest items in S
-    smallest_indices = k_smallest_indices(k, distance_array)
+    smallest_indices = k_smallest_indices(k, distances)
 
     # Find the points corresponding to those indices
     nearest_neighbors = [S[i] for i in smallest_indices]
@@ -47,28 +47,29 @@ def box_dist(point, box_center, box_radius):
 
 # The radius of a set is the largest distance between any two points in the set S
 def set_radius(S):
-    distance_matrix = np.zeros((len(S), len(S)))
-    distance_matrix.flat = [distance(p0, p1) for p0 in S for p1 in S]
-    return np.max(distance_matrix)
+    distances = [distance(p0, p1) for p0 in S for p1 in S]
+    return np.max(distances)
 
-def csearch_morton(point, A_i, i, k, low, hi):
+def csearch(point, A_i, i, k, low, hi):
     if (hi-low) < V_CONSTANT:
         return set_knn(point[i], k, list(set(A_i + point[low:hi])))
+
     mid = int((hi + low) / 2)
-    A_i = set_knn(point[i], k, list(set(A_i + point[mid])))
-    if box_dist(point[i], point[low], dist(point[low], point[hi])) > set_radius(A_i):
+    A_i = set_knn(point[i], k, list(set(A_i + [point[mid]])))
+    if box_dist(point[i], point[low], distance(point[low], point[hi])) > set_radius(A_i):
         return A_i
-    if MortonPoint(point[i]) < MortonPoint(point[m]):
-        A_i = csearch_morton(point, A_i, i, k, low, mid - 1)
-        if MortonPoint(point[m]) < MortonPoint(point[i] ** np.ceil(set_radius(A_i))):
-            A_i = csearch_morton(point, A_i, i, k, mid + 1, hi)
+    if point[i] < point[mid]:
+        A_i = csearch(point, A_i, i, k, low, mid - 1)
+        if point[mid] < point[i].shift(np.ceil(set_radius(A_i))):
+            A_i = csearch(point, A_i, i, k, mid + 1, hi)
     else:
-        A_i = csearch_morton(point, A_i, i, k, mid + 1, hi)
-        if MortonPoint(point[i] ** (-1 * np.ceil(set_radius(A_i)))) < MortonPoint(point[mid]):
-            A_i = csearch_morton(point, A_i, i, low, mid - 1)
+        A_i = csearch(point, A_i, i, k, mid + 1, hi)
+        if point[i].shift(-1 * np.ceil(set_radius(A_i))) < point[mid]:
+            A_i = csearch(point, A_i, k, i, low, mid - 1)
+
     return A_i
 
-def construct_morton(points, i, k):
+def construct(points, i, k):
     A_i = set_knn(points[i], k, points[max(0,i-k):min(len(points),i+k)])
     if len(A_i) < k:
         A_i.append(points[i])
@@ -79,83 +80,35 @@ def construct_morton(points, i, k):
     #print "point_i:", points[i]
     #print "A_i:", A_i
     # if p_i^ceil(rad(A_i)) < p_i+k
-    if MortonPoint(np.array(points[i]) ** np.ceil(set_radius(A_i))) < MortonPoint(np.array(points[min(i+k, len(points)-1)])):
+    if points[i].shift(math.ceil(set_radius(A_i))) < points[min(i+k, len(points)-1)]:
         upper = i
     else:
         I = 0
-        while MortonPoint(np.array(points[i]) ** np.ceil(set_radius(A_i))) < MortonPoint(np.array(points[min(len(points)-1, i+2**I)])):
+        while points[i].shift(math.ceil(set_radius(A_i))) < points[min(len(points)-1, i+2**I)]:
             I += 1
         upper = min(i + 2**I, len(points)-1)
 
     # if p_i^-ceil(rad(A_i)) > p_i-k
-    if MortonPoint(np.array(points[i]) ** (-1 * np.ceil(set_radius(A_i)))) > MortonPoint(np.array(points[max(0, i-k)])):
+    if points[i].shift(-1 * math.ceil(set_radius(A_i))) > points[max(0, i-k)]:
         lower = i
     else:
         I = 0
-        while MortonPoint(np.array(points[i] ** (-1 * np.ceil(set_radius(A_i))))) > MortonPoint(np.array(points[max(0, i-2**I)])):
+        while points[i].shift(-1 * math.ceil(set_radius(A_i))) > points[max(0, i-2**I)]:
             I += 1
-        lower = np.max(i - 2**I, 0)
+        lower = max(i - 2**I, 0)
 
     if lower != upper:
-        A_i = csearch_morton(points, A_i, i, k, lower, upper)
-
-    return A_i
-
-def csearch_hilbert(point, A_i, i, k, low, hi, precision):
-    if (hi-low) < V_CONSTANT:
-        return set_knn(point[i], k, list(set(A_i + point[low:hi])))
-    mid = int((hi + low) / 2)
-    A_i = set_knn(point[i], k, list(set(A_i + point[mid])))
-    if box_dist(point[i], point[low], dist(point[low], point[hi])) > set_radius(A_i):
-        return A_i
-    if HilbertPoint(point[i], precision) < HilbertPoint(point[m], precision):
-        A_i = csearch_hilbert(point, A_i, i, k, low, mid - 1, precision)
-        if HilbertPoint(point[m], precision) < HilbertPoint(point[i] ** np.ceil(set_radius(A_i)), precision):
-            A_i = csearch_hilbert(point, A_i, i, k, mid + 1, hi, precision)
-    else:
-        A_i = csearch_hilbert(point, A_i, i, k, mid + 1, hi, precision)
-        if HilbertPoint(point[i] ** (-1 * np.ceil(set_radius(A_i))), precision) < HilbertPoint(point[mid], precision):
-            A_i = csearch_hilbert(point, A_i, i, low, mid - 1, precision)
-    return A_i
-
-def construct_hilbert(points, i, k, precision):
-    A_i = set_knn(points[i], k, points[max(0,i-k):min(len(points),i+k)])
-    if len(A_i) < k:
-        A_i.append(points[i])
-    upper = 0
-    lower = 0
-        
-    #print "Iteration:", i
-    #print "point_i:", points[i]
-    #print "A_i:", A_i
-    # if p_i^ceil(rad(A_i)) < p_i+k
-    if HilbertPoint(np.array(points[i]) ** np.ceil(set_radius(A_i)), precision) < HilbertPoint(np.array(points[min(i+k, len(points)-1)]), precision):
-        upper = i
-    else:
-        I = 0
-        while HilbertPoint(np.array(points[i]) ** np.ceil(set_radius(A_i)), precision) < HilbertPoint(np.array(points[min(len(points)-1, i+2**I)]), precision):
-            I += 1
-        upper = min(i + 2**I, len(points)-1)
-
-    # if p_i^-ceil(rad(A_i)) > p_i-k
-    if HilbertPoint(np.array(points[i]) ** (-1 * np.ceil(set_radius(A_i))), precision) > HilbertPoint(np.array(points[max(0, i-k)]), precision):
-        lower = i
-    else:
-        I = 0
-        while HilbertPoint(np.array(points[i] ** (-1 * np.ceil(set_radius(A_i)))), precision) > HilbertPoint(np.array(points[max(0, i-2**I)]), precision):
-            I += 1
-        lower = np.max(i - 2**I, 0)
-
-    if lower != upper:
-        A_i = csearch_hilbert(points, A_i, i, k, lower, upper, precision)
+        A_i = csearch(points, A_i, i, k, lower, upper)
 
     return A_i
         
 
 def main(file_name, k):
-    #P = [(x,y) for x in range(20) for y in range(20)]
-    dataset = np.genfromtxt(str(file_name), delimiter="\t")
-    P = [tuple(item) for item in dataset]
+    dataset = [(x,y) for x in range(20) for y in range(20)]
+    #dataset = np.genfromtxt(str(file_name), delimiter="\t", dtype=np.uint32)
+
+    HP = [Point(item, sftype='hilbert') for item in dataset]
+    MP = [Point(item, sftype='morton') for item in dataset]
 
     t_cum_aknn = 0
     t_cum_knn = 0
@@ -188,15 +141,13 @@ def main(file_name, k):
     print "Time OPT:", t_cum_knn
     print "Average times distance from OPT:", average_distance_from_opt / len(P)
     """
-    print "Constructing Hilbert Ordering..."
-    hilbert_index(P, len(P[0]), precision)
     t_cum_aknn = 0
     t_cum_knn = 0
     print ""
-    print "Running Hilbert AKNN comparison on", len(P), "points..."
+    print "Running Hilbert AKNN comparison on", len(HP), "points..."
     average_distance_from_opt = 0
-    for i in range(len(P)):
-        iter_fraction = float(i) / len(P)
+    for i in range(len(HP)):
+        iter_fraction = float(i) / len(HP)
 
         # Progress bar
         amtDone = iter_fraction * 100
@@ -204,21 +155,21 @@ def main(file_name, k):
         sys.stdout.flush()
 
         t0_aknn = time.time()
-        AKNN_i = construct_hilbert(P, i, k, precision)
+        AKNN_i = construct(HP, i, k)
         tf_aknn = time.time() - t0_aknn
         t_cum_aknn += tf_aknn
 
         t0_knn = time.time()
-        KNN_i = set_knn(P[i], k, P)
+        KNN_i = set_knn(HP[i], k, HP)
         tf_knn = time.time() - t0_knn
         t_cum_knn += tf_knn
         
         average_distance_from_opt += set_radius(AKNN_i) / set_radius(KNN_i)
-        #print P[i], "\tCorrect:", num_correct, "/", k
+        print HP[i], "\tAKNN:", AKNN_i, "\tOPT:", KNN_i
     print ""
     print "Time Hilbert AKNN:", t_cum_aknn
     print "Time OPT:", t_cum_knn
-    print "Average times distance from OPT:", average_distance_from_opt / len(P)
+    print "Average times distance from OPT:", average_distance_from_opt / len(HP)
 
 
 if __name__ == "__main__":
