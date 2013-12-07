@@ -11,7 +11,6 @@
 # Based on algorithm detailed by Michael Connor and Piyush Kumar
 # http://doi.ieeecomputersociety.org/10.1109/TVCG.2010.9
 
-
 import numpy as np
 import sys
 import math
@@ -102,16 +101,16 @@ def construct(points, i, k):
     return A_i
         
 
-def main(file_name, k):
+def main(file_name, k, validate):
     #dataset = [(x,y) for x in range(20) for y in range(20)]
     dataset = np.genfromtxt(str(file_name), delimiter="\t", dtype=np.uint32)
 
-    print "Generating Hilbert points:",
+    print "Generating Hilbert ordering:",
     HP = [Point(item, sftype='hilbert') for item in dataset]
     print "Sorting..."
-    HP.sort(key=lambda h: h.index_hilbert())
+    HP.sort(key=lambda h: h.index_hilbert()) # Have to use this or we run into issues with 'long'
 
-    print "Generating Morton points:",
+    print "Generating Morton ordering:",
     MP = [Point(item, sftype='morton') for item in dataset]
     print "Sorting..."
     MP.sort(cmp=cmp_zorder)
@@ -121,8 +120,9 @@ def main(file_name, k):
     precision = 32
     t_cum_hilbert = 0
     t_cum_morton = 0
-    t_cum_naive = 0
-    
+    t_cum_naive0 = 0
+    t_cum_naive1 = 0
+
     print ""
     print "Approximate", str(k)+"-Nearest Neighbours"
     print "Running AKNN comparison on", len(HP), "points in", len(HP[0]), "dimensions..."
@@ -133,8 +133,9 @@ def main(file_name, k):
 
         # Progress bar
         amtDone = iter_fraction * 100
-        sys.stdout.write("\r%.1f%%" %amtDone)
-        sys.stdout.flush()
+        if not validate:
+            sys.stdout.write("\r%.1f%%" %amtDone)
+            sys.stdout.flush()
 
         t0_hilbert = time.time()
         AKNN_hilbert = construct(HP, i, k)
@@ -146,21 +147,42 @@ def main(file_name, k):
         tf_morton = time.time() - t0_morton
         t_cum_morton += tf_morton
 
-        t0_naive = time.time()
-        KNN_i = set_knn(HP[i], k, HP)
-        tf_naive = time.time() - t0_naive
-        t_cum_naive += tf_naive
+        t0_naive0 = time.time()
+        KNN_i0 = set_knn(HP[i], k, HP)
+        tf_naive0 = time.time() - t0_naive0
+        t_cum_naive0 += tf_naive0
+
+        t0_naive1 = time.time()
+        KNN_i1 = set_knn(MP[i], k, MP)
+        tf_naive1 = time.time() - t0_naive1
+        t_cum_naive1 += tf_naive1
+
+        if(validate):
+            print "========== Iteration",i,"=========="
+            print "Hilbert Point:", HP[i]
+            print "Z-Order Point:", MP[i]
+            print "Hilbert AKNN:", AKNN_hilbert
+            print " Naive KNN 0:", KNN_i0
+            print "Z-Order AKNN:", AKNN_morton
+            print " Naive KNN 1:", KNN_i1
+
         
-        distance_ratio_hilbert += set_radius(AKNN_hilbert) / set_radius(KNN_i)
-        distance_ratio_morton += set_radius(AKNN_morton) / set_radius(KNN_i)
+        distance_ratio_hilbert += set_radius(AKNN_hilbert) / set_radius(KNN_i0)
+        distance_ratio_morton += set_radius(AKNN_morton) / set_radius(KNN_i1)
 
     print ""
     print "Time Hilbert AKNN:", t_cum_hilbert
     print "Time Z-Order AKNN:", t_cum_morton
-    print "Time Naive KNN:", t_cum_naive
+    print "Time Naive KNN 0:", t_cum_naive0
+    print "Time Naive KNN 1:", t_cum_naive1
     print "Average radius ratio Hilbert from OPT:", distance_ratio_hilbert / len(HP)
-    print "Average radius ratio Z-Order from OPT:", distance_ratio_morton / len(HP)
-
+    print "Average radius ratio Z-Order from OPT:", distance_ratio_morton / len(MP)
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2])
+    validate = False
+    try:
+        if sys.argv[3] == "validate":
+            validate = True
+    except:
+        pass
+    main(sys.argv[1], sys.argv[2], validate)
