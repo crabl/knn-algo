@@ -14,7 +14,7 @@
 \newcommand{\etal}{\emph{et al.}}
 
 \begin{document}
-\title{K Nearest Neighbour Search Using Space-filling Curves}
+\title{$k$-Nearest Neighbour Search Using Space-filling Curves}
 \author{Camara Lerner \hspace{2cm} Christopher Rabl \\
   Department of Mathematics and Computer Science \\
   University of Lethbridge, Canada}
@@ -23,7 +23,9 @@
 
 \section{Introduction}
 
-All methods of calculating K-Nearest Neighbours (KNN) are marred by the so-called ``curse of dimensionality'' \cite{Bellman:2003}. Even though it is not an NP-Complete problem, it is still difficult to calculate KNN in high dimensions since, if we assume that the algorithm is acting on $n$ $d$-dimensional points, the naive implementation takes $O(dn)$ time. Approaches such as spatially ordered trees (such as quadtrees and $kd$-trees) and space-filling curves have been applied to this problem in order to solve it more quickly than the naive approach (calculating a distance matrix between each point and choosing the smallest $k$ entries from the row corresponding to the query point $q$).
+In the field of Machine Learning, the $k$-nearest neighbour problem is defined as follows: we are given a set of points $P = \left\{ {(v_i, c_i) : v_i \in \mathbb{R}^d, c_i \in C } \right\}$, where $C$ is a set of class labels (for instance, a binary class labeling would be: $C = \left\{ {0,1} \right\}$) and $v_i$ is a $d$-dimensional vector. The task at hand is, given a point $(q, c) \not \in P$, and where $c$ is unknown, attempt to assign a class label from $C$ the point based on the values of vectors that are close to $q$ in $P$. \\
+
+All methods of calculating kNN are marred by the so-called ``curse of dimensionality'' \cite{Bellman:2003}. Even though it is not an NP-Complete problem, it is still difficult to calculate kNN in high dimensions since, if we assume that the algorithm is acting on $n$ $d$-dimensional points, the naive implementation takes $O(dn)$ time. Approaches such as spatially-ordered trees (such as quadtrees and $kd$-trees) and space-filling curves have been applied to this problem in order to solve it more quickly than the naive approach (calculating a distance matrix between each point and choosing the smallest $k$ entries from the row corresponding to the query point $q$).
 
 \section{Method of Dahl and Wootters}
 
