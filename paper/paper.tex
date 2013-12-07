@@ -127,9 +127,9 @@ Contrary to the project proposal, the authors decided against exploring the appr
 
 \section{Hilbert Curve}
 
-The Hilbert Curve is a space-filling curve that is based on a generalization of Gray codes in $d$ dimensions. The curve is defined based on the amount of space the curve fills. The space that the curve fills can be in any dimensionally space $(n)$ with the length of each dimension filled equal to $2^m$. This means that for each point in the curve the maximum bit size for each dimension is $(m)$. The algorithm used is adapted from~\cite{Hamilton:2006}. 
+The Hilbert Curve is a space-filling curve that is based on a generalization of Gray codes in $d$ dimensions. The curve is defined based on the amount of space the curve fills. The space that the curve fills can be in any dimensionally space $(n)$ with the length of each dimension filled equal to $2^m$. This means that for each point in the curve the maximum bit size for each dimension is $(m)$. The algorithm used is adapted from~\cite{Hamilton:2006}. \\
 
-The curve labels the points from $0$ to $2^{m*n} - 1$ in the order that the curve visits each point. The Hilbert Curve considered here will start in the bottom left hand corner and finishes in the upper left corner. 
+The curve labels the points from $0$ to $2^{m*n} - 1$ in the order that the curve visits each point. The Hilbert Curve considered here will start in the bottom left hand corner and finishes in the upper left corner. \\
 
 With Hilbert curves that which uses only one bit called the unit Hilbert curve, is reflected and rotated and moved around to fill the space of the larger Hilbert Curve, and then these unit Hilbert curves are connected to make the overall Hilbert curve. The only constraint on the unit Hilbert curves is that the start and end points must match up with their neighbouring unit Hilbert curves. The same idea is done with gray code, but they  can only be reflected and reversed. These facts are used to inverse the operation of and get the point from the index in the list for both gray code and Hilbert indexing. Hilbert curves also can use information from gray code in determining the changes to the unit Hilbert curve.
  
@@ -213,10 +213,13 @@ In determining the Hilbert curve index the $l$ variable used in~(\ref{hilbert-po
   \end{algorithmic}
 \end{algorithm}
 
-\section{Implementation Correctness}
+\section{Implementation Correctness \& Experiments}
 
-In order to ensure the correctness of our implementation, some small test cases were generated and verified by hand over the course of the development process. These have been digitized and implemented in the form of Python unit tests using the UnitTest library. Additionally, the correctness of the ordering operators were verified using a similar approach.
+In order to ensure the correctness of our implementation, some small test cases were generated and verified by hand over the course of the development process. These were computed manually but implemented in the form of Python unit tests using the UnitTest library. Additionally, the correctness of the ordering operators were verified using a similar approach. \\
 
+Experimental data was generated both randomly and deterministically in order to test the efficiency and effectiveness of the algorithms: real-world datasets were also obtained and evaluated as part of our experiment, specifically the ``Yeast times 100'' dataset which consists of 1484 vectors in 8 dimensions, and the ``ARCENE'' dataset \cite{ARCENE:2004} which consists of 700 vectors in 1024 dimensions. Both real-world datasets were obtained from the UCI Machine Learning Repository \cite{UCI:2013}. \\
+
+These datasets were used to assess the performance of the different space-filling curve methods on high- and very high-dimensional real-world data. All experimental results were collected using Python 2.7.5 on Mac OS X 10.9. The system configuration used to test the algorithm was a mid-2013 Apple MacBook Air with a 1.3GHz Intel Core i5 processor and 4GB of RAM.
 
 \section{Results}
 
