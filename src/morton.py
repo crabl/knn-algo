@@ -1,3 +1,6 @@
+# Adapted from Wikipedia
+# http://en.wikipedia.org/wiki/Z-order_curve
+
 def less_msb(x, y):
     return x < y and x < (x ^ y)
 
