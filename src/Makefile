@@ -4,6 +4,9 @@ run-wine-5nn:
 run-validate-4nn:
 	python main.py data/lattice_40x40.csv 4 validate
 
+run-lattice-10nn:
+	python main.py data/lattice_40x40.csv 10
+
 run-random-10nn:
 	python main.py data/lattice_40x40_random.csv 10
 
