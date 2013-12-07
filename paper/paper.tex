@@ -16,42 +16,54 @@
 \begin{document}
 \title{K Nearest Neighbour Search Using Space-filling Curves}
 \author{Camara Lerner \hspace{2cm} Christopher Rabl \\
-  Department of Mathematics and Computer Science\\
+  Department of Mathematics and Computer Science \\
   University of Lethbridge, Canada}
 
 \maketitle
 
-\begin{abstract}
-
-\end{abstract}
-
 \section{Introduction}
 
+\section{Morton Curve}
 
 \section{Hilbert Curve}
 
-The Hilbert Curve is a space filling curve that makes the next point in the curve only one unit distance from the previous point. The curve is defined based on the amount of space the curve fills. The space that the curve fills can be in any dimensionally space $(n)$ with the length of each dimension filled equal to $2^m$. This means that for each point in the curve the maximum bit size for each dimension is $(m)$~\cite{Hamilton:2006}. 
+The Hilbert Curve is a space filling curve that makes the next point in the curve only one unit distance from the previous point. The curve is defined based on the amount of space the curve fills. The space that the curve fills can be in any dimensionally space $(n)$ with the length of each dimension filled equal to $2^m$. This means that for each point in the curve the maximum bit size for each dimension is $(m)$. The algorithm used is adapted from~\cite{Hamilton:2006}. 
 
-The curve labels the points from $0$ to $2^{m*n} - 1$ in the order that the curve visits each point. The Hilbert Curve considered here will start in the bottom left hand corner and finishes in the upper left corner~\cite{Hamilton:2006}. 
+The curve labels the points from $0$ to $2^{m*n} - 1$ in the order that the curve visits each point. The Hilbert Curve considered here will start in the bottom left hand corner and finishes in the upper left corner. 
 
-With Hilbert curves that which uses only one bit called the unit Hilbert curve, is reflected and rotated and moved around to fill the space of the larger Hilbert Curve, and then these unit Hilbert curves are connected to make the overall Hilbert curve. The only constraint on the unit Hilbert curves is that the start and end points must match up with their neighbouring unit Hilbert curves. The same idea is done with gray code, but they  can only be reflected and reversed. These facts are used to inverse the operation of and get the point from the index in the list for both gray code and Hilbert indexing. Hilbert curves also can use information from gray code in determining the changes to the unit Hilbert curve~\cite{Hamilton:2006}.
+With Hilbert curves that which uses only one bit called the unit Hilbert curve, is reflected and rotated and moved around to fill the space of the larger Hilbert Curve, and then these unit Hilbert curves are connected to make the overall Hilbert curve. The only constraint on the unit Hilbert curves is that the start and end points must match up with their neighbouring unit Hilbert curves. The same idea is done with gray code, but they  can only be reflected and reversed. These facts are used to inverse the operation of and get the point from the index in the list for both gray code and Hilbert indexing. Hilbert curves also can use information from gray code in determining the changes to the unit Hilbert curve.
  
 
 \flushleft
-Formula for Gray Code is in \ref{gray-code}.
+Formula for Gray Code is in~\ref{gray-code}.
 \begin{equation}
   \label{gray-code}
   gc(i) = i \oplus \left( i \gg 1 \right) 
 \end{equation}
 
-Formula for $g$ is displayed in \ref{g}.
+\begin{algorithm}
+  \caption{The algorithm for calculating the Gray Code Inverse of $g \in \mathbb{N}$, calculates the $i \in \mathbb{N}$ such that $gc\left( i \right) = g $ }
+  \label{gray-code-inverse}
+  \begin{algorithmic}[1]
+    \Require $g \in \mathbb{N}$ 
+    \State $ m \leftarrow \text{ number of bits to represent } g$ 
+    \State $ \left( i, j \right) \leftarrow \left( g, 1 \right) $ 
+    \While{$ j < m $ }
+    \State $ i \leftarrow i \oplus \left( g \gg j \right)$ 
+    \State $ j \leftarrow j + 1$ 
+    \EndWhile \\
+    \Return $i$ % \in \mathbb{N} \text{ such that } gc \left( i \right) = g $
+  \end{algorithmic}
+\end{algorithm}
+
+From one point in the Hilbert curve to another since only one bit changes by onepoint to another there is a formula to determine which bit changes. The formula for this returns the bit that will change next~\ref{g}.
 \begin{equation}
   \label{g}
   g(i) = \lfloor \log _{2} \left( gc(i) \oplus gc(i+1) \right) \rfloor + 1
 \end{equation}
 
 
-Formula for $d(i)$ is displayed in \ref{d}.
+The direction of the unit Hilbert curve is represented by~\ref{d}.
 \begin{equation}
   \label{d}
   d(i) = 
@@ -62,15 +74,7 @@ Formula for $d(i)$ is displayed in \ref{d}.
     \end{cases}
 \end{equation}
 
-
-Formula for the bitwise right rotation is displayed in \ref{right-rotate}. The bitwise left rotation is similar.
-\begin{equation}
-  \label{right-rotate}
-  a \rightturn i = \left[ a_{{n - 1 + i}\pmod{n}} \ldots a_{i\pmod{n}} \right]_{\left[ 2 \right]}, \text{ where } a = \left[ a_{n-1} \ldots a_0\right]_{\left[ 2 \right]} 
-\end{equation}
-
-
-Formula for $e$ is displayed in \ref{e}.
+The entry point of the unit Hilbert curve is represented by~\ref{e}.
 \begin{equation}
   \label{e}
   e(i) =  
@@ -80,46 +84,38 @@ Formula for $e$ is displayed in \ref{e}.
     \end{cases}
 \end{equation}
 
+Formula for the bitwise right rotation is displayed in \ref{right-rotate}. The bitwise left rotation is similar.
+\begin{equation}
+  \label{right-rotate}
+  a \rightturn i = \left[ a_{{n - 1 + i}\pmod{n}} \ldots a_{i\pmod{n}} \right]_{\left[ 2 \right]}, \text{ where } a = \left[ a_{n-1} \ldots a_0\right]_{\left[ 2 \right]} 
+\end{equation}
 
-
-\begin{algorithm}
-  \caption{The algorithm for calculating the Gray Code Inverse of $g \in \mathbb{N}$, calculates the $i \in \mathbb{N}$ such that $gc\left( i \right) = g $ }
-  \label{gray-code-inverse}
-  \begin{algorithmic}[1]
-    \Require $g \in \mathbb{N}$
-    \Return $i \in \mathbb{N} \text{ such that } gc \left( i \right) = g $
-    \State $ m \leftarrow \text{ number of bits to represent } g$ 
-    \State $ \left( i, j \right) \leftarrow \left( g, 1 \right) $ 
-    \While{$ j < m $ }
-    \State $ i \leftarrow i \oplus \left( g \gg j \right)$ 
-    \State $ j \leftarrow j + 1$ 
-    \EndWhile
-    % \oplus is exclusive or
-    % \ll left shift
-    % \gg right shift
-    % \mid bitwise or
-  \end{algorithmic}
-\end{algorithm}
+In determining the Hilbert curve index the $l$ variable used in~\ref{hilbert-point-to-index} has each bit representing whether the point point is above or below the axis corresponding to each bit. And the $e$ and $d$ variables represent the rotation and reflections nessesary to map the current sub-Hilbert curve containing the point ${\bf p}$ to the normal orientation of sub-Hilbert curve. These values are recalculated until the sub-Hilbert curve is a unit Hilbert curve. There is also a variable $w$, which is calculated at every iteration that is ORed wit$h$ after $h$ is bit-shifted left one bit. Then after all the iterations $h$ is the index of the point ${\bf p}$. The algorithn runs in $O(m^2)$ time.
 
 \begin{algorithm}
-  \caption{Calculating the Hilbert index given any dimensional point ${\bf p}$ 
+  \caption{Calculates the Hilbert index given any dimensional point ${\bf p}$ 
     of size $n$ as long as the bits used within an index of the hilbert curve 
     space is specified in ($m$).}
   \label{hilbert-point-to-index}
   \begin{algorithmic}[1]
-    \Require $n, m \in \mathbb{N} - \{0\} \text{ and a point } {\bf p} \in \mathbb{N}^n$
-    \Return $h \in \mathbb{N} \text{, the Hilbert index of the point }{\bf p}$
+    \Require $n, m \in \mathbb{N} - \{0\} \text{ and a point } {\bf p} \in \mathbb{N}^n$ 
     \State $ \left( h, e, d \right) \leftarrow \left( 0, 0, 0 \right) $
     \For{$j\gets m - 1, 0$} 
     \State $ l \leftarrow \left[ \left( p_{n-1} , i \right) \ldots \left( p_0 , i \right) \right]_{\left[ 2 \right]} $ 
-    \State $ l \leftarrow \left( b \oplus e \right) \rightturn \left( d+1 \right)$ 
+    \State $ l \leftarrow \left( l \oplus e \right) \rightturn \left( d+1 \right)$ 
     \State $ w \leftarrow gc^{-1} \left( l \right)$ 
     \State $ e \leftarrow e \oplus \left( e \left( w \right) \leftturn \left( d+ 1 \right) \right) $ 
     \State $ d \leftarrow d + d \left( w \right) + 1 \pmod{n}$ 
     \State $ h \leftarrow \left( h \ll n \right) | w $
-    \EndFor
+    \EndFor \\
+    \Return $h $%\in \mathbb{N} \text{, the Hilbert index of the point }{\bf p}$
+
   \end{algorithmic}
 \end{algorithm}
+
+\section{Algorithm}
+
+\section{Results}
 
 \bibliographystyle{amsplain}
 \bibliography{mybiblio}
