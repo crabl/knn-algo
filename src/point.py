@@ -30,6 +30,9 @@ class Point(object):
         result = Point(tuple([x + amount for x in self.coordinates]), precision=self.precision, sftype=self.sftype)
         return result
     
+    def __len__(self):
+        return self.dimension
+
     def __lt__(self, other):
         self.check_valid()
         if self.sftype == 'hilbert':

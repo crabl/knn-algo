@@ -121,42 +121,17 @@ def main(file_name, k):
     print "Sorting..."
     MP.sort(cmp=cmp_zorder)
 
-    t_cum_aknn = 0
-    t_cum_knn = 0
+
     k = int(k)
     precision = 32
-    """
-    print "Running Z-order AKNN comparison on", len(P), "points..."
-    average_distance_from_opt = 0
-    for i in range(len(P)):
-        iter_fraction = float(i) / len(P)
-
-        # Progress bar
-        amtDone = iter_fraction * 100
-        sys.stdout.write("\r%.1f%%" %amtDone)
-        sys.stdout.flush()
-
-        t0_aknn = time.time()
-        AKNN_i = construct_morton(P, i, k)
-        tf_aknn = time.time() - t0_aknn
-        t_cum_aknn += tf_aknn
-
-        t0_knn = time.time()
-        KNN_i = set_knn(P[i], k, P)
-        tf_knn = time.time() - t0_knn
-        t_cum_knn += tf_knn
-        
-        average_distance_from_opt += set_radius(AKNN_i) / set_radius(KNN_i)
+    t_cum_hilbert = 0
+    t_cum_morton = 0
+    t_cum_naive = 0
+    
     print ""
-    print "Time Morton AKNN:", t_cum_aknn
-    print "Time OPT:", t_cum_knn
-    print "Average times distance from OPT:", average_distance_from_opt / len(P)
-    """
-    t_cum_aknn = 0
-    t_cum_knn = 0
-    print ""
-    print "Running Hilbert AKNN comparison on", len(HP), "points..."
-    average_distance_from_opt = 0
+    print "Running AKNN comparison on", len(HP), "points in", len(HP[0]),"dimensions..."
+    distance_ratio_hilbert = 0
+    distance_ratio_morton = 0
     for i in range(len(HP)):
         iter_fraction = float(i) / len(HP)
 
@@ -165,22 +140,31 @@ def main(file_name, k):
         sys.stdout.write("\r%.1f%%" %amtDone)
         sys.stdout.flush()
 
-        t0_aknn = time.time()
-        AKNN_i = construct(HP, i, k)
-        tf_aknn = time.time() - t0_aknn
-        t_cum_aknn += tf_aknn
+        t0_hilbert = time.time()
+        AKNN_hilbert = construct(HP, i, k)
+        tf_hilbert = time.time() - t0_hilbert
+        t_cum_hilbert += tf_hilbert
 
-        t0_knn = time.time()
+        t0_morton = time.time()
+        AKNN_morton = construct(MP, i, k)
+        tf_morton = time.time() - t0_morton
+        t_cum_morton += tf_morton
+
+        t0_naive = time.time()
         KNN_i = set_knn(HP[i], k, HP)
-        tf_knn = time.time() - t0_knn
-        t_cum_knn += tf_knn
+        tf_naive = time.time() - t0_naive
+        t_cum_naive += tf_naive
         
-        average_distance_from_opt += set_radius(AKNN_i) / set_radius(KNN_i)
+        distance_ratio_hilbert += set_radius(AKNN_hilbert) / set_radius(KNN_i)
+        distance_ratio_morton += set_radius(AKNN_morton) / set_radius(KNN_i)
+
         #print HP[i], "\tAKNN:", AKNN_i, "\tOPT:", KNN_i
     print ""
-    print "Time Hilbert AKNN:", t_cum_aknn
-    print "Time OPT:", t_cum_knn
-    print "Average times distance from OPT:", average_distance_from_opt / len(HP)
+    print "Time Hilbert AKNN:", t_cum_hilbert
+    print "Time Z-Order AKNN:", t_cum_morton
+    print "Time Naive KNN:", t_cum_naive
+    print "Average radius ratio Hilbert from OPT:", distance_ratio_hilbert / len(HP)
+    print "Average radius ratio Z-Order from OPT:", distance_ratio_morton / len(HP)
 
 
 if __name__ == "__main__":
