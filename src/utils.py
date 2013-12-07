@@ -1,3 +1,7 @@
+# Copyright (C) 2013 Aldo Cortesi
+# Adapted from source code by Aldo Cortesi
+# https://github.com/cortesi/scurve
+
 """
     A lot of these functions are written for clarity rather than speed. We'll
     fix that in time.

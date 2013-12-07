@@ -1,10 +1,13 @@
+# Application Unit Tests
+# Copyright (C) 2013 Christopher Rabl
+
 from point import *
 import unittest
 
 class PointTests(unittest.TestCase):
     a = Point((1,1,1))
     b = Point((1,1,2))
-    
+
     def create_invalid(self):
         return Point((0,0,0), sftype='invalid')
     
