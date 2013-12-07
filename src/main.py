@@ -129,7 +129,7 @@ def main(file_name, k):
     t_cum_naive = 0
     
     print ""
-    print "Running AKNN comparison on", len(HP), "points in", len(HP[0]),"dimensions..."
+    print "Running AKNN comparison on", len(HP), "points in", len(HP[0]), "dimensions..."
     distance_ratio_hilbert = 0
     distance_ratio_morton = 0
     for i in range(len(HP)):
