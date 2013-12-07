@@ -23,7 +23,7 @@
 
 \section{Introduction}
 
-All methods of calculating K-Nearest Neighbours (KNN) are marred by the ``curse of dimensionality'' \cite{Bellman:2003}. Even though it is not an NP-Complete problem, it is still difficult to calculate KNN in high dimensions. Approaches such as spatially ordered trees (such as quadtrees and $kd$-trees) and space-filling curves have been applied to this problem in order to solve it more quickly than the naive approach (calculating a distance matrix between each point and choosing the smallest $k$ entries from the row corresponding to the query point $q$).
+All methods of calculating K-Nearest Neighbours (KNN) are marred by the so-called ``curse of dimensionality'' \cite{Bellman:2003}. Even though it is not an NP-Complete problem, it is still difficult to calculate KNN in high dimensions since, if we assume that the algorithm is acting on $n$ $d$-dimensional points, the naive implementation takes $O(dn)$ time. Approaches such as spatially ordered trees (such as quadtrees and $kd$-trees) and space-filling curves have been applied to this problem in order to solve it more quickly than the naive approach (calculating a distance matrix between each point and choosing the smallest $k$ entries from the row corresponding to the query point $q$).
 
 \section{Method of Dahl and Wootters}
 

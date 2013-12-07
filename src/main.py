@@ -14,7 +14,6 @@
 import numpy as np
 import sys
 import math
-import bitstring
 import time
 
 from point import *

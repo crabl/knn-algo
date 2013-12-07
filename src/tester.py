@@ -82,7 +82,7 @@ class AlgorithmCorrectnessTests(unittest.TestCase):
 
         for i in range(len(self.HP)):
             self.assertEqual(all([p in valid[i] for p in construct(self.HP, i, self.k)]), True)
-    
+    """
     def test_morton_construct(self):
         # First case will only return us k-1 results because it is the bottom corner
         correct = [[(0, 1), (1, 0), (1, 1)],
@@ -110,7 +110,7 @@ class AlgorithmCorrectnessTests(unittest.TestCase):
 
         for i in range(len(self.MP)):
             self.assertEqual(all([p in valid[i] for p in construct(self.MP, i, self.k)]), True)
-
+    """
 
 
 if __name__ == "__main__":
