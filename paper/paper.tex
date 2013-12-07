@@ -25,6 +25,96 @@
 
 \section{Morton Curve}
 
+\begin{algorithm}
+  \caption{COMPARE(point ${\bf p}$, point ${\bf q}$)}
+  \label{compare}
+  \begin{algorithmic}[1]
+    \State $x \leftarrow 0, dim \leftarrow 0$
+    \ForAll{j=0 to d}
+    \State $y \leftarrow \text{FirstMSB}(p_{[j]}, q_{[j]})$
+    \If{$x < y$}
+    \State $x \leftarrow y, dim \leftarrow j$
+    \EndIf 
+    \EndFor \\
+    \Return $p_{[dim]} < q_{[dim]}$
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+  \caption{FirstMSB(double $a$, double $b$)}
+  \label{first-msb}
+  \begin{algorithmic}[1]
+    \State $w \leftarrow x < y \text{ and } x < (x \mathrel{\&} y)$ \\
+    \Return $w$
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+  \caption{KNN Graph Construction Algorithm}
+  \label{knn-graph-alg}
+  \begin{algorithmic}[1]
+    \Require $\text{Mortan order compare operators: } <, > 
+    \text{ and Hilbert order compare operators: } <, >$
+    \Ensure $A_i \text{ contains } k \text{ nearest neighbors of } p_i \text{ in } P \text{.}$
+    \State $P \leftarrow \text{QuickSort}(P, <)$
+    \ForAll{$p_i$ in $P$}
+    \State $A_i \leftarrow \text{SET-KNN}(p_i, \{p_{i-k}, \dots, p_{i+k} \})$
+    \If{$\text{SHIFT}(p_i, \lceil \text{SET-RAD}(A_i) \rceil) < p_{i+k}$}
+    \State $upper \leftarrow i$
+    \Else
+    \State $I \leftarrow 1$
+    \While{$\text{SHIFT}(p_i, \lceil \text{SET-RAD}(A_i) \rceil) < p_{i+2^I}$}
+    \State $++I$
+    \EndWhile
+    \State $upper \leftarrow \text{min}(i+2^I, n)$
+    \EndIf
+    \If{$\text{SHIFT}(p_i, - \lceil \text{SET-RAD}(A_i) \rceil) > p_{i-k}$}
+    \State $lower \leftarrow i$
+    \Else
+    \State $I \leftarrow 1$
+    \While{$\text{SHIFT}(p_i, - \lceil \text{SET-RAD}(A_i) \rceil)$}
+    \State $++I$
+    \EndWhile
+    \State $lower \leftarrow \text{max}(i-2^I, 1)$
+    \EndIf
+    \If{$lower \not= upper$}
+    \State $A_i \leftarrow \text{CSEARCH}(p_i, lower, upper)$
+    \EndIf
+    \EndFor \\
+    \Return $A_i$
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+  \caption{CSEARCH(point $p_i$, int $lo$, int $hi$)}
+  \label{csearch}
+  \begin{algorithmic}[1]
+    \If{$(hi - lo) < v $}
+    \State $A_i \leftarrow \text{SET-KNN}(p_i, A_i \cup \{ p_{lo} \dots p_{hi} \})$
+    \Return $A_i$
+    \EndIf
+    \State $mid \leftarrow (hi+lo)/2$
+    \State $A_i \leftarrow \text{SET-KNN}(p_i, A_i \cup p_{mid})$
+    \If{$\text{DIST}(p_i, \text{CIRCLE}(p_{lo}, p_{hi})) \ge \text{SET-RAD}(A_i)$} 
+    \Return $A_i$
+    \EndIf
+    \If{$p_i < p_{mid}$}
+    \State $A_i \leftarrow \text{CSEARCH}(p_i, lo, mid-1)$
+    \If{$p_{mid} < \text{SHIFT}(p_i, \lceil \text{SET-RAD}(A_i) \rceil)$}
+    \State $A_i \leftarrow \text{CSEARCH}(p_i, mid+1, hi)$
+    \EndIf
+    \Else
+    \State $A_i \leftarrow \text{CSEARCH}(p_i, mid+1, hi)$
+    \If{$\text{SHIFT}(p_i, - \lceil \text{SET-RAD}(A_i) \rceil) < p_{mid}$}
+    \State $A_i \leftarrow \text{CSEARCH}(p_i, low, mid - 1)$
+    \EndIf
+    \EndIf \\
+    \Return $A_i$
+    
+  \end{algorithmic}
+\end{algorithm}
+
+
 \section{Hilbert Curve}
 
 The Hilbert Curve is a space filling curve that makes the next point in the curve only one unit distance from the previous point. The curve is defined based on the amount of space the curve fills. The space that the curve fills can be in any dimensionally space $(n)$ with the length of each dimension filled equal to $2^m$. This means that for each point in the curve the maximum bit size for each dimension is $(m)$. The algorithm used is adapted from~\cite{Hamilton:2006}. 
@@ -56,14 +146,14 @@ Formula for Gray Code is in~\ref{gray-code}.
   \end{algorithmic}
 \end{algorithm}
 
-From one point in the Hilbert curve to another since only one bit changes by onepoint to another there is a formula to determine which bit changes. The formula for this returns the bit that will change next~\ref{g}.
+From one point in the Hilbert curve to another since only one bit changes by onepoint to another there is a formula to determine which bit changes. The formula for this returns the bit that will change next~(\ref{g}).
 \begin{equation}
   \label{g}
   g(i) = \lfloor \log _{2} \left( gc(i) \oplus gc(i+1) \right) \rfloor + 1
 \end{equation}
 
 
-The direction of the unit Hilbert curve is represented by~\ref{d}.
+The direction of the unit Hilbert curve is represented by~(\ref{d}).
 \begin{equation}
   \label{d}
   d(i) = 
@@ -74,7 +164,7 @@ The direction of the unit Hilbert curve is represented by~\ref{d}.
     \end{cases}
 \end{equation}
 
-The entry point of the unit Hilbert curve is represented by~\ref{e}.
+The entry point of the unit Hilbert curve is represented by~(\ref{e}).
 \begin{equation}
   \label{e}
   e(i) =  
@@ -84,13 +174,13 @@ The entry point of the unit Hilbert curve is represented by~\ref{e}.
     \end{cases}
 \end{equation}
 
-Formula for the bitwise right rotation is displayed in \ref{right-rotate}. The bitwise left rotation is similar.
+Formula for the bitwise right rotation is displayed in~(\ref{right-rotate}). The bitwise left rotation is similar.
 \begin{equation}
   \label{right-rotate}
   a \rightturn i = \left[ a_{{n - 1 + i}\pmod{n}} \ldots a_{i\pmod{n}} \right]_{\left[ 2 \right]}, \text{ where } a = \left[ a_{n-1} \ldots a_0\right]_{\left[ 2 \right]} 
 \end{equation}
 
-In determining the Hilbert curve index the $l$ variable used in~\ref{hilbert-point-to-index} has each bit representing whether the point point is above or below the axis corresponding to each bit. And the $e$ and $d$ variables represent the rotation and reflections nessesary to map the current sub-Hilbert curve containing the point ${\bf p}$ to the normal orientation of sub-Hilbert curve. These values are recalculated until the sub-Hilbert curve is a unit Hilbert curve. There is also a variable $w$, which is calculated at every iteration that is ORed wit$h$ after $h$ is bit-shifted left one bit. Then after all the iterations $h$ is the index of the point ${\bf p}$. The algorithn runs in $O(m^2)$ time.
+In determining the Hilbert curve index the $l$ variable used in~(\ref{hilbert-point-to-index}) has each bit representing whether the point point is above or below the axis corresponding to each bit. And the $e$ and $d$ variables represent the rotation and reflections nessesary to map the current sub-Hilbert curve containing the point ${\bf p}$ to the normal orientation of sub-Hilbert curve. These values are recalculated until the sub-Hilbert curve is a unit Hilbert curve. There is also a variable $w$, which is calculated at every iteration that is ORed wit$h$ after $h$ is bit-shifted left one bit. Then after all the iterations $h$ is the index of the point ${\bf p}$. The algorithn runs in $O(m^2)$ time.
 
 \begin{algorithm}
   \caption{Calculates the Hilbert index given any dimensional point ${\bf p}$ 
