@@ -23,6 +23,16 @@
 
 \section{Introduction}
 
+All methods of calculating K-Nearest Neighbours (KNN) are marred by the ``curse of dimensionality'' \cite{Bellman:2003}. Even though it is not an NP-Complete problem, it is still difficult to calculate KNN in high dimensions. Approaches such as spatially ordered trees (such as quadtrees and $kd$-trees) and space-filling curves have been applied to this problem in order to solve it more quickly than the naive approach (calculating a distance matrix between each point and choosing the smallest $k$ entries from the row corresponding to the query point $q$).
+
+\section{Method of Dahl and Wootters}
+
+Contrary to the project proposal, the authors decided against exploring the approach of Dahl and Wootters \cite{Dahl:2008} due to a significant lack of implementation specificity: many important details were completely omitted from the paper and could not be extrapolated based on the context of the statements in which they appeared. Instead, a variant of method by Connor and Kumar \cite{Connor:2010} was chosen, since comparing and contrasting the neighbourhood-preserving properties of each space-filling curve turned out to be a more fruitful and unique comparison.
+
+\section{Space-Filling Curves}
+
+
+
 \section{Morton Curve}
 
 \begin{algorithm}
@@ -53,8 +63,8 @@
   \caption{KNN Graph Construction Algorithm}
   \label{knn-graph-alg}
   \begin{algorithmic}[1]
-    \Require $\text{Mortan order compare operators: } <, > 
-    \text{ and Hilbert order compare operators: } <, >$
+    \Require $\text{Morton order comparison operator: } < 
+    \text{ and Hilbert order compare operator: } <$
     \Ensure $A_i \text{ contains } k \text{ nearest neighbors of } p_i \text{ in } P \text{.}$
     \State $P \leftarrow \text{QuickSort}(P, <)$
     \ForAll{$p_i$ in $P$}
@@ -117,7 +127,7 @@
 
 \section{Hilbert Curve}
 
-The Hilbert Curve is a space filling curve that makes the next point in the curve only one unit distance from the previous point. The curve is defined based on the amount of space the curve fills. The space that the curve fills can be in any dimensionally space $(n)$ with the length of each dimension filled equal to $2^m$. This means that for each point in the curve the maximum bit size for each dimension is $(m)$. The algorithm used is adapted from~\cite{Hamilton:2006}. 
+The Hilbert Curve is a space-filling curve that is based on a generalization of Gray codes in $d$ dimensions. The curve is defined based on the amount of space the curve fills. The space that the curve fills can be in any dimensionally space $(n)$ with the length of each dimension filled equal to $2^m$. This means that for each point in the curve the maximum bit size for each dimension is $(m)$. The algorithm used is adapted from~\cite{Hamilton:2006}. 
 
 The curve labels the points from $0$ to $2^{m*n} - 1$ in the order that the curve visits each point. The Hilbert Curve considered here will start in the bottom left hand corner and finishes in the upper left corner. 
 
@@ -203,14 +213,19 @@ In determining the Hilbert curve index the $l$ variable used in~(\ref{hilbert-po
   \end{algorithmic}
 \end{algorithm}
 
-\section{Algorithm}
+\section{Implementation Correctness}
+
+In order to ensure the correctness of our implementation, some small test cases were generated and verified by hand over the course of the development process. These have been digitized and implemented in the form of Python unit tests using the UnitTest library. Additionally, the correctness of the ordering operators were verified using a similar approach.
+
 
 \section{Results}
+
+More text here
 
 \begin{figure}
 \begin{center}
 \includegraphics[scale=0.5]{YeaGra.png}
-\caption{The Runtime Analysis of the Yeast Database.}
+\caption{Running time analysis of the Yeast dataset ($d = 8$, $n = 1484$).}
 \label{run-yeast}
 \end{center}
 \end{figure}
@@ -218,7 +233,7 @@ In determining the Hilbert curve index the $l$ variable used in~(\ref{hilbert-po
 \begin{figure}
 \begin{center}
 \includegraphics[scale=0.5]{ArcGra.png}
-\caption{The Runtime Analysis of the Acrene Database.}
+\caption{Running time analysis of the ARCENE dataset ($d = 1024$, $n = 700$).}
 \label{run-arcene}
 \end{center}
 \end{figure}
@@ -226,7 +241,7 @@ In determining the Hilbert curve index the $l$ variable used in~(\ref{hilbert-po
 \begin{figure}
 \begin{center}
 \includegraphics[scale=0.5]{LatGra.png}
-\caption{The Runtime Analysis of the Lattice Database.}
+\caption{Running time analysis of the integer lattice dataset ($d = 2$, $n = 1600$).}
 \label{run-lattice}
 \end{center}
 \end{figure}
@@ -234,7 +249,7 @@ In determining the Hilbert curve index the $l$ variable used in~(\ref{hilbert-po
 \begin{figure}
 \begin{center}
 \includegraphics[scale=0.5]{YeaGra2.png}
-\caption{The Approximation bound of the Yeast Database.}
+\caption{Approximation bound of the Yeast dataset ($d = 8$, $n = 1484$).}
 \label{approx-yeast}
 \end{center}
 \end{figure}
@@ -242,7 +257,7 @@ In determining the Hilbert curve index the $l$ variable used in~(\ref{hilbert-po
 \begin{figure}
 \begin{center}
 \includegraphics[scale=0.5]{ArcGra2.png}
-\caption{The Approximation bound of the Acrene Database.}
+\caption{Approximation bound of the ARCENE dataset ($d = 1024$, $n = 700$).}
 \label{approx-acrene}
 \end{center}
 \end{figure}
@@ -250,7 +265,7 @@ In determining the Hilbert curve index the $l$ variable used in~(\ref{hilbert-po
 \begin{figure}
 \begin{center}
 \includegraphics[scale=0.5]{LatGra2.png}
-\caption{The Approximation bound of the Lattice Database.}
+\caption{Approximation bound of the integer lattice dataset ($d = 2$, $n = 1600$).}
 \label{approx-lattice}
 \end{center}
 \end{figure}
