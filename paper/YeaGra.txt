@@ -1,0 +1,13 @@
+set terminal png
+set output "YeaGra.png"
+set xlabel "k"
+set ylabel "Running Time (S)"
+set style line 1 lc rgb "#0000FF" ps 1 pt 5
+set style line 2 lc rgb "#FF0000" ps 1 pt 7
+set style line 3 lc rgb "#006400" ps 1 pt 4
+plot 'Yeast.txt' \
+using 1:2 with linespoint ls 1 title 'Hilbert', \
+'Yeast.txt' \
+using 1:3 with linespoint ls 2 title 'Morton', \
+'Yeast.txt' \
+using 1:4 with linespoint ls 3 title 'Naive'
