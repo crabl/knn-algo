@@ -1,3 +1,7 @@
+# Multidimensional Point Class
+# Supports Hilbert and Z-Order Comparison
+# Copyright (C) 2013 Christopher Rabl
+
 import math
 
 import hilbert

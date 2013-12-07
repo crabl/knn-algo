@@ -4,18 +4,19 @@
 # space and find k-nearest neighbors based on this ordering
 
 # CPSC 4110 - Approximation Algorithms
-# Camara Lerner & Chris Rabl
+# Implemented by:
+# Camara Lerner - https://github.com/lernerc
+# Christopher Rabl - https://github.com/crabl 
 
-import numpy
+# Based on algorithm detailed by Michael Connor and Piyush Kumar
+# http://doi.ieeecomputersociety.org/10.1109/TVCG.2010.9
+
+
+import numpy as np
 import sys
 import math
 import bitstring
-import numpy as np 
 import time
-import warnings
-
-# Ignore exponent divide-by-zero warning
-#warnings.simplefilter("ignore", RuntimeWarning) 
 
 from point import *
 
@@ -27,8 +28,7 @@ def distance(a, b):
 
 # Find the indices of the k smallest items in a set S, assuming that S contains a zero element
 def k_smallest_indices(k, S):
-    # We have to look at [1:k+1] because we assume that S contains the point
-    # that we are looking for
+    # We have to look at [1:k+1] because we assume that S contains the point that we are looking for
     return [idx for (s, idx) in sorted(zip(S,range(len(S))))][1:k+1]
 
 # Find the k nearest neighbors to a point in a given set S
@@ -52,7 +52,7 @@ def box_dist(point, box_center, box_radius):
 # The radius of a set is the largest distance between any two points in the set S
 def set_radius(S):
     distances = [distance(p0, p1) for p0 in S for p1 in S]
-    return np.max(distances)
+    return max(distances)
 
 def csearch(point, A_i, i, k, low, hi):
     if (hi-low) < V_CONSTANT:
@@ -64,11 +64,11 @@ def csearch(point, A_i, i, k, low, hi):
         return A_i
     if point[i] < point[mid]:
         A_i = csearch(point, A_i, i, k, low, mid - 1)
-        if point[mid] < point[i].shift(np.ceil(set_radius(A_i))):
+        if point[mid] < point[i].shift(math.ceil(set_radius(A_i))):
             A_i = csearch(point, A_i, i, k, mid + 1, hi)
     else:
         A_i = csearch(point, A_i, i, k, mid + 1, hi)
-        if point[i].shift(-1 * np.ceil(set_radius(A_i))) < point[mid]:
+        if point[i].shift(-1 * math.ceil(set_radius(A_i))) < point[mid]:
             A_i = csearch(point, A_i, k, i, low, mid - 1)
 
     return A_i
@@ -79,11 +79,7 @@ def construct(points, i, k):
         A_i.append(points[i])
     upper = 0
     lower = 0
-        
-    #print "Iteration:", i
-    #print "point_i:", points[i]
-    #print "A_i:", A_i
-    # if p_i^ceil(rad(A_i)) < p_i+k
+
     if points[i].shift(math.ceil(set_radius(A_i))) < points[min(len(points)-1, i+k)]:
         upper = i
     else:
@@ -92,7 +88,6 @@ def construct(points, i, k):
             I += 1
         upper = min(i + 2**I, len(points)-1)
 
-    # if p_i^-ceil(rad(A_i)) > p_i-k
     if points[i].shift(-1 * math.ceil(set_radius(A_i))) > points[i-k]:
         lower = i
     else:
@@ -111,12 +106,12 @@ def main(file_name, k):
     #dataset = [(x,y) for x in range(20) for y in range(20)]
     dataset = np.genfromtxt(str(file_name), delimiter="\t", dtype=np.uint32)
 
-    print "Generating Hilbert points..."
+    print "Generating Hilbert points:",
     HP = [Point(item, sftype='hilbert') for item in dataset]
     print "Sorting..."
-    HP.sort(cmp=cmp_hilbert)
+    HP.sort(key=lambda h: h.index_hilbert())
 
-    print "Generating Morton points..."
+    print "Generating Morton points:",
     MP = [Point(item, sftype='morton') for item in dataset]
     print "Sorting..."
     MP.sort(cmp=cmp_zorder)
@@ -129,6 +124,7 @@ def main(file_name, k):
     t_cum_naive = 0
     
     print ""
+    print "Approximate", str(k)+"-Nearest Neighbours"
     print "Running AKNN comparison on", len(HP), "points in", len(HP[0]), "dimensions..."
     distance_ratio_hilbert = 0
     distance_ratio_morton = 0
@@ -158,7 +154,6 @@ def main(file_name, k):
         distance_ratio_hilbert += set_radius(AKNN_hilbert) / set_radius(KNN_i)
         distance_ratio_morton += set_radius(AKNN_morton) / set_radius(KNN_i)
 
-        #print HP[i], "\tAKNN:", AKNN_i, "\tOPT:", KNN_i
     print ""
     print "Time Hilbert AKNN:", t_cum_hilbert
     print "Time Z-Order AKNN:", t_cum_morton
